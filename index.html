@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="tk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çal — Işewürlik hasaby</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--bg2:#fff;--bg3:#f0eeea;--bg4:#e8e5df;
+  --border:#e2dfd8;--border2:#c8c3b8;
+  --text:#1a1916;--text2:#5c574e;--text3:#9c9589;
+  --accent:#2c5282;--accent-light:#ebf0f8;--accent2:#1a3a5c;
+  --green:#1a6b4a;--green-bg:#eaf4ee;
+  --red:#b83232;--red-bg:#fdf0f0;
+  --amber:#8a5e00;--amber-bg:#fdf6e3;
+  --purple:#5b3fa0;--purple-bg:#f2eeff;
+  --teal:#0f766e;--teal-bg:#f0fdfb;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:8px;--r2:12px;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:var(--font);cursor:pointer}
+input,select,textarea{font-family:var(--font)}
+.layout{display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:248px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:100;overflow-y:auto}
+.main{margin-left:248px;flex:1}
+.sb-logo{padding:22px 20px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.sb-logo-icon{width:36px;height:36px;background:var(--accent);border-radius:var(--r);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-icon svg{width:20px;height:20px;color:#fff}
+.sb-logo-title{font-size:16px;font-weight:700;letter-spacing:-.3px}
+.sb-logo-sub{font-size:11px;color:var(--text3);margin-top:1px}
+.sb-section{padding:8px 0}
+.sb-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;padding:8px 20px 6px}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 20px;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;border-left:2px solid transparent;margin:1px 0}
+.nav-item:hover{color:var(--text);background:var(--bg3)}
+.nav-item.active{color:var(--accent);background:var(--accent-light);border-left-color:var(--accent);font-weight:600}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.sb-stores{padding:0 10px 8px}
+.store-nav{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .12s}
+.store-nav:hover{background:var(--bg3);color:var(--text)}
+.store-nav.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.store-dot{width:7px;height:7px;border-radius:50%;background:var(--border2);flex-shrink:0}
+.store-nav.active .store-dot{background:var(--accent)}
+.store-debt-tag{margin-left:auto;font-size:11px;color:var(--red);font-family:var(--mono);font-weight:500}
+.add-store-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;border:1px dashed var(--border2);width:100%;background:none;transition:all .12s;margin-top:6px}
+.add-store-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+.add-store-btn svg{width:13px;height:13px}
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.page-title{font-size:18px;font-weight:700;letter-spacing:-.4px}
+.page-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.topbar-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:600;border:none;transition:all .12s;display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(44,82,130,.3)}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:var(--bg2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #f0c0c0}
+.btn-danger:hover{background:#fae0e0}
+.btn-success{background:var(--green-bg);color:var(--green);border:1px solid #b0d9c4}
+.btn-success:hover{background:#d0eedd}
+.btn-teal{background:var(--teal-bg);color:var(--teal);border:1px solid #9fd0ca}
+.btn-teal:hover{background:#d8f5f0}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-xs{padding:3px 8px;font-size:11px;border-radius:5px}
+.btn svg{width:14px;height:14px}
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+.page-body{padding:28px}
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;margin-bottom:18px;box-shadow:var(--sh)}
+.card-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:14px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:.5px}
+.card-title svg{width:14px;height:14px}
+/* METRICS */
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-bottom:20px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;box-shadow:var(--sh)}
+.metric-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.metric-val{font-size:24px;font-weight:700;color:var(--text);font-family:var(--mono);letter-spacing:-.5px;line-height:1}
+.metric-val.green{color:var(--green)}.metric-val.red{color:var(--red)}.metric-val.amber{color:var(--amber)}.metric-val.blue{color:var(--accent)}.metric-val.teal{color:var(--teal)}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:5px}
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.3px}
+.form-input{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 11px;color:var(--text);font-size:13px;transition:all .12s}
+.form-input:focus{outline:none;border-color:var(--accent);background:var(--bg2);box-shadow:0 0 0 3px rgba(44,82,130,.08)}
+.form-input::placeholder{color:var(--text3)}
+select.form-input option{background:var(--bg2)}
+.form-input[readonly]{color:var(--accent);font-family:var(--mono);font-weight:600}
+/* PAY TYPE */
+.ptype-group{display:flex;gap:6px;flex-wrap:wrap}
+.ptype-btn{padding:7px 14px;border-radius:var(--r);border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px}
+.ptype-btn svg{width:14px;height:14px}
+.ptype-btn:hover{border-color:var(--border2);color:var(--text);background:var(--bg4)}
+.ptype-btn.sel-cash{background:var(--green-bg);border-color:#90ccb0;color:var(--green)}
+.ptype-btn.sel-credit{background:var(--red-bg);border-color:#f0b0b0;color:var(--red)}
+.ptype-btn.sel-partial{background:var(--amber-bg);border-color:#e0c070;color:var(--amber)}
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.7px;text-transform:uppercase;padding:9px 12px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;background:var(--bg3)}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--border);color:var(--text);font-size:13px;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg3)}
+.mono{font-family:var(--mono)}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.badge-cash{background:var(--green-bg);color:var(--green)}
+.badge-credit{background:var(--red-bg);color:var(--red)}
+.badge-partial{background:var(--amber-bg);color:var(--amber)}
+.badge-return{background:var(--purple-bg);color:var(--purple)}
+.badge-paid{background:var(--green-bg);color:var(--green)}
+.badge-bottle{background:var(--teal-bg);color:var(--teal)}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(10,10,8,.5);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.3px}
+.modal-close{background:var(--bg3);border:1px solid var(--border);color:var(--text3);width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0}
+.modal-close:hover{background:var(--bg4);color:var(--text)}
+.modal-close svg{width:13px;height:13px}
+/* MISC */
+.divider{border:none;border-top:1px solid var(--border);margin:18px 0}
+.empty{text-align:center;padding:48px 24px;color:var(--text3)}
+.empty-icon{width:48px;height:48px;margin:0 auto 14px;background:var(--bg3);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.empty-icon svg{width:24px;height:24px;color:var(--border2)}
+.empty-title{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.empty-sub{font-size:12px}
+.progress-bar{height:5px;background:var(--bg4);border-radius:99px;overflow:hidden;margin-top:6px}
+.progress-fill{height:100%;border-radius:99px;transition:width .3s}
+/* INNER TABS */
+.inner-tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:20px}
+.inner-tab{padding:9px 16px;font-size:13px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px}
+.inner-tab svg{width:13px;height:13px}
+.inner-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.inner-tab:hover:not(.active){color:var(--text2)}
+.inner-section{display:none}
+.inner-section.active{display:block}
+/* STORE HEADER */
+.store-hcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:16px;box-shadow:var(--sh)}
+.store-avatar{width:50px;height:50px;border-radius:var(--r2);background:var(--accent-light);border:1px solid #c8d8f0;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--accent);flex-shrink:0;font-family:var(--mono)}
+.store-info-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.store-info-sub{font-size:12px;color:var(--text3);margin-top:3px}
+.store-hactions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.debt-banner{background:var(--red-bg);border:1px solid #f0c0c0;border-radius:var(--r2);padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.debt-label{font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:4px}
+.debt-amount{font-size:22px;font-weight:700;color:var(--red);font-family:var(--mono)}
+/* PAYMENT ITEM */
+.pay-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.pay-item:last-child{border-bottom:none}
+.pay-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* BOTTLE STOCK BANNER */
+.bottle-banner{background:var(--teal-bg);border:1px solid #9fd0ca;border-radius:var(--r2);padding:16px 22px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.bottle-banner-item{display:flex;flex-direction:column;gap:3px}
+.bottle-banner-label{font-size:10px;font-weight:600;color:var(--teal);text-transform:uppercase;letter-spacing:.7px}
+.bottle-banner-val{font-size:22px;font-weight:700;color:var(--teal);font-family:var(--mono)}
+.bottle-banner-sub{font-size:11px;color:var(--text3)}
+/* CHART */
+.bar-chart{display:flex;align-items:flex-end;gap:10px;height:140px;padding-bottom:28px}
+.bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.chart-legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+/* LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:900px){.two-col{grid-template-columns:1fr}}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;border-radius:var(--r);padding:11px 18px;font-size:13px;z-index:9999;display:none;box-shadow:var(--sh2);animation:slideUp .2s ease}
+.toast.show{display:flex;align-items:center;gap:8px}
+.toast.error{background:var(--red)}
+.toast svg{width:15px;height:15px;flex-shrink:0}
+@keyframes slideUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <div>
+      <div class="sb-logo-title">Çal Biznes</div>
+      <div class="sb-logo-sub">Hasap ulgamy</div>
+    </div>
+  </div>
+  <div class="sb-section">
+    <div class="sb-label">Nawigasiýa</div>
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>Baş sahypa
+    </div>
+    <div class="nav-item" onclick="showPage('bottles')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 4H8L9 3z"/><path d="M8 7v10a3 3 0 006 0V7"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Baklažkalar
+    </div>
+    <div class="nav-item" onclick="showPage('purchases')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Satyn alyşlar
+    </div>
+    <div class="nav-item" onclick="showPage('analytics')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analitika
+    </div>
+    <div class="nav-item" onclick="showPage('reports')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Hasabatlar
+    </div>
+  </div>
+  <div class="sb-section" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;">
+    <div class="sb-label">Dükanlар</div>
+    <div class="sb-stores" id="stores-nav"></div>
+    <div style="padding:0 10px 16px;">
+      <button class="add-store-btn" onclick="openModal('modal-add-store')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Dükan goş
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="topbar">
+    <div><div class="page-title">Baş sahypa</div><div class="page-sub">Işiň umumy ýagdaýy</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-teal btn-sm" onclick="showPage('bottles')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 4H8L9 3z"/><path d="M8 7v10a3 3 0 006 0V7"/></svg>Baklažkalar
+      </button>
+    </div>
+  </div>
+  <div class="page-body">
+    <div id="dash-metrics" class="metrics-grid"></div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Dükanlar boýunça bergiler</div>
+        <div id="dash-debts-list"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>Aýlyk dinamika</div>
+        <div id="dash-chart"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2"/></svg>Soňky amallar</div>
+      <div id="dash-recent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTLES PAGE -->
+<div id="page-bottles" class="page">
+  <div class="topbar">
+    <div><div class="page-title">Baklažkalar</div><div class="page-sub">Ätiýaçlyk gory we gelip gowuşmalar</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" onclick="openAddBottleBatchModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Gelip gowuşma goş
+      </button>
+    </div>
+  </div>
+  <div class="page-body">
+    <div id="bottles-metrics" class="metrics-grid"></div>
+    <div id="bottles-banner"></div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 4H8L9 3z"/><path d="M8 7v10a3 3 0 006 0V7"/></svg>Gelip gowuşmalar taryhy</div>
+      <div class="table-wrap" id="bottles-table"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PURCHASES PAGE -->
+<div id="page-purchases" class="page">
+  <div class="topbar">
+    <div><div class="page-title">Satyn alyşlar (çal)</div><div class="page-sub">Önüm satyn alyş taryhy</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" onclick="openAddPurchaseModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Satyn alyş goş
+      </button>
+    </div>
+  </div>
+  <div class="page-body">
+    <div id="purchases-metrics" class="metrics-grid"></div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/></svg>Satyn alyş taryhy</div>
+      <div class="table-wrap" id="purchases-table"></div>
+    </div>
+  </div>
+</div>
+
+<!-- STORE PAGE -->
+<div id="page-store" class="page">
+  <div class="topbar">
+    <div><div class="page-title" id="store-page-title">Dükan</div><div class="page-sub" id="store-page-sub">Iberişler we hasaplaşyklar</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" onclick="openAddDeliveryModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Täze iberme
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="openPaymentModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Töleg kabul et
+      </button>
+    </div>
+  </div>
+  <div class="page-body" id="store-page-body"></div>
+</div>
+
+<!-- ANALYTICS PAGE -->
+<div id="page-analytics" class="page">
+  <div class="topbar">
+    <div><div class="page-title">Analitika</div><div class="page-sub">Döwürler boýunça seredip görmek</div></div>
+    <div class="topbar-actions">
+      <select class="form-input" id="analytics-month-select" onchange="renderAnalyticsPage()" style="width:auto;padding:7px 11px;font-size:13px;"></select>
+    </div>
+  </div>
+  <div class="page-body" id="analytics-body"></div>
+</div>
+
+<!-- REPORTS PAGE -->
+<div id="page-reports" class="page">
+  <div class="topbar">
+    <div><div class="page-title">Hasabatlar</div><div class="page-sub">Jemleýji maglumatlar</div></div>
+  </div>
+  <div class="page-body" id="reports-body"></div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ═══════ MODALS ═══════ -->
+
+<!-- ADD STORE -->
+<div class="modal-overlay" id="modal-add-store">
+  <div class="modal">
+    <div class="modal-title">Täze dükan
+      <button class="modal-close" onclick="closeModal('modal-add-store')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Dükan ady</label><input class="form-input" id="ns-name" placeholder="Ahmet's dükan..."></div>
+      <div class="form-group"><label class="form-label">Aragatnaşyk</label><input class="form-input" id="ns-contact" placeholder="Ahmet"></div>
+      <div class="form-group"><label class="form-label">Telefon</label><input class="form-input" id="ns-phone" placeholder="+993 ..."></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Salgy</label><input class="form-input" id="ns-addr" placeholder="Aşgabat, köçe..."></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-store')">Ýatyr</button>
+      <button class="btn btn-primary" onclick="saveNewStore()">Dükan goş</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD BOTTLE BATCH -->
+<div class="modal-overlay" id="modal-add-bottle">
+  <div class="modal">
+    <div class="modal-title">Baklažka gelip gowuşmasy
+      <button class="modal-close" onclick="closeModal('modal-add-bottle')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="background:var(--teal-bg);border:1px solid #9fd0ca;border-radius:var(--r);padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--teal);">
+      Häzirki ätiýaçlyk: <strong id="bottle-modal-stock" style="font-family:var(--mono);">0</strong> sany baklažka
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Sene</label><input class="form-input" type="date" id="btl-date"></div>
+      <div class="form-group"><label class="form-label">Mukdary (sany)</label><input class="form-input" type="number" id="btl-qty" placeholder="100" min="1" oninput="updateBottleTotal()"></div>
+      <div class="form-group"><label class="form-label">Baklažka bahasy (1 sany)</label><input class="form-input" type="number" id="btl-bottle-price" placeholder="0.50" step="0.01" min="0" oninput="updateBottleTotal()"></div>
+      <div class="form-group"><label class="form-label">Naklýka bahasy (1 sany)</label><input class="form-input" type="number" id="btl-label-price" placeholder="0.10" step="0.01" min="0" oninput="updateBottleTotal()"></div>
+      <div class="form-group"><label class="form-label">Üpjünçi</label><input class="form-input" id="btl-supplier" placeholder="Öndüriji..."></div>
+      <div class="form-group"><label class="form-label">Bellik</label><input class="form-input" id="btl-note" placeholder="Goşmaça maglumat..."></div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+        <div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:4px;">Baklažka jemi</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--teal);" id="btl-bottle-total">0.00</div></div>
+        <div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:4px;">Naklýka jemi</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--amber);" id="btl-label-total">0.00</div></div>
+        <div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;font-weight:600;letter-spacing:.5px;margin-bottom:4px;">Umumy jemi</div><div class="mono" style="font-size:16px;font-weight:700;color:var(--accent);" id="btl-grand-total">0.00</div></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-bottle')">Ýatyr</button>
+      <button class="btn btn-teal" onclick="saveBottleBatch()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Goşmaga ýatda sakla
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PURCHASE -->
+<div class="modal-overlay" id="modal-add-purchase">
+  <div class="modal">
+    <div class="modal-title">Täze satyn alyş (çal)
+      <button class="modal-close" onclick="closeModal('modal-add-purchase')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Sene</label><input class="form-input" type="date" id="pur-date"></div>
+      <div class="form-group"><label class="form-label">Mukdary (çüýşe)</label><input class="form-input" type="number" id="pur-qty" placeholder="200" min="1"></div>
+      <div class="form-group"><label class="form-label">Özüne düşüş (1 sany)</label><input class="form-input" type="number" id="pur-cost" placeholder="5.00" step="0.01" min="0"></div>
+      <div class="form-group"><label class="form-label">Üpjünçi</label><input class="form-input" id="pur-supplier" placeholder="Öndüriji..."></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Jemi (awtomatik)</label><input class="form-input" id="pur-total" placeholder="0.00" readonly></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-purchase')">Ýatyr</button>
+      <button class="btn btn-primary" onclick="savePurchase()">Ýatda sakla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD DELIVERY -->
+<div class="modal-overlay" id="modal-add-delivery">
+  <div class="modal">
+    <div class="modal-title">Täze iberme
+      <button class="modal-close" onclick="closeModal('modal-add-delivery')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Sene</label><input class="form-input" type="date" id="del-date"></div>
+      <div class="form-group"><label class="form-label">Mukdary (çüýşe)</label><input class="form-input" type="number" id="del-qty" placeholder="30" min="1" oninput="updateDeliveryTotal()"></div>
+      <div class="form-group"><label class="form-label">Satyş bahasy (1 sany)</label><input class="form-input" type="number" id="del-price" placeholder="8.00" step="0.01" min="0" oninput="updateDeliveryTotal()"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Jemi pul</label><input class="form-input" id="del-total" readonly placeholder="0.00"></div>
+    </div>
+    <hr class="divider">
+    <div style="margin-bottom:14px;">
+      <div class="form-label" style="margin-bottom:10px;">Töleg görnüşi</div>
+      <div class="ptype-group">
+        <button class="ptype-btn sel-cash" onclick="setPayType('cash')" id="pt-cash">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Nagt
+        </button>
+        <button class="ptype-btn" onclick="setPayType('credit')" id="pt-credit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/></svg>Karz
+        </button>
+        <button class="ptype-btn" onclick="setPayType('partial')" id="pt-partial">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Bölekleýin
+        </button>
+      </div>
+    </div>
+    <div id="partial-amount-wrap" style="display:none;">
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label">Häzir tölenilen (öňünden)</label>
+        <input class="form-input" type="number" id="del-paid-now" placeholder="0.00" step="0.01" min="0">
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-delivery')">Ýatyr</button>
+      <button class="btn btn-primary" onclick="saveDelivery()">Iberme ýatda sakla</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div class="modal-overlay" id="modal-payment">
+  <div class="modal">
+    <div class="modal-title">Töleg kabul et
+      <button class="modal-close" onclick="closeModal('modal-payment')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="background:var(--red-bg);border:1px solid #f0c0c0;border-radius:var(--r);padding:14px 16px;margin-bottom:18px;">
+      <div style="font-size:11px;color:var(--red);text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:5px;">Dükanyň häzirki bergi</div>
+      <div style="font-size:26px;font-weight:700;color:var(--red);font-family:var(--mono);" id="modal-debt-amount">0.00</div>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Töleg senesi</label><input class="form-input" type="date" id="pay-date"></div>
+      <div class="form-group"><label class="form-label">Töleg mukdary</label><input class="form-input" type="number" id="pay-amount" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Bellik</label><input class="form-input" id="pay-note" placeholder="Nagt / geçirme..."></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-payment')">Ýatyr</button>
+      <button class="btn btn-success" onclick="savePayment()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Tölegi ýaz
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- RETURN -->
+<div class="modal-overlay" id="modal-return">
+  <div class="modal">
+    <div class="modal-title">Çüýşe yzyna gaýtarma
+      <button class="modal-close" onclick="closeModal('modal-return')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Sene</label><input class="form-input" type="date" id="ret-date"></div>
+      <div class="form-group"><label class="form-label">Mukdary (çüýşe)</label><input class="form-input" type="number" id="ret-qty" placeholder="5" min="1"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Sebäp</label><input class="form-input" id="ret-reason" placeholder="Satylmady..."></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-return')">Ýatyr</button>
+      <button class="btn btn-primary" onclick="saveReturn()">Ýaz</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <svg id="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"></svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+// ═══════════════ DB ═══════════════
+let DB = {
+  stores:[], purchases:[], deliveries:[], payments:[], returns:[],
+  bottleBatches:[]  // {id, date, qty, bottlePrice, labelPrice, supplier, note}
+};
+let currentStoreId = null;
+let currentPayType = 'cash';
+
+function save(){ localStorage.setItem('chal_v4', JSON.stringify(DB)); }
+function load(){
+  try {
+    const raw = localStorage.getItem('chal_v4') || localStorage.getItem('chal_v2_tk') || localStorage.getItem('chal_v2');
+    if(raw){ const p=JSON.parse(raw); DB={...DB,...p}; if(!DB.bottleBatches)DB.bottleBatches=[]; }
+  } catch(e){}
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function today(){ return new Date().toISOString().split('T')[0]; }
+function fmt(n){ return parseFloat(n||0).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtN(n){ return Math.round(n||0).toLocaleString('ru-RU'); }
+function getStore(id){ return DB.stores.find(s=>s.id===id)||{name:'?',contact:''}; }
+
+const MTK=['Ýan','Few','Mar','Apr','Maý','Iýun','Iýul','Awg','Sen','Okt','Noý','Dek'];
+function monthLabel(ym){ const[y,m]=ym.split('-'); return MTK[parseInt(m)-1]+' '+y; }
+
+// ─── Bottle stock ───
+function bottleStockIn(){ return DB.bottleBatches.reduce((s,b)=>s+b.qty,0); }
+function bottleStockUsed(){ return DB.deliveries.reduce((s,d)=>s+d.qty,0); }
+function bottleStockLeft(){ return Math.max(0, bottleStockIn()-bottleStockUsed()); }
+function bottleTotalCost(){ return DB.bottleBatches.reduce((s,b)=>s+(b.qty*b.bottlePrice)+(b.qty*b.labelPrice),0); }
+function bottleAvgCostPerUnit(){
+  const totalIn=bottleStockIn();
+  return totalIn>0 ? bottleTotalCost()/totalIn : 0;
+}
+
+// ─── Store calcs ───
+function storeDebt(id){
+  const sold=DB.deliveries.filter(d=>d.storeId===id).reduce((s,d)=>s+d.qty*d.price,0);
+  const paidImm=DB.deliveries.filter(d=>d.storeId===id).reduce((s,d)=>s+d.paidNow,0);
+  const paidLater=DB.payments.filter(p=>p.storeId===id).reduce((s,p)=>s+p.amount,0);
+  return Math.max(0,sold-paidImm-paidLater);
+}
+function getDeliveryPrice(sid){ const l=[...DB.deliveries].filter(d=>d.storeId===sid).sort((a,b)=>b.date.localeCompare(a.date))[0]; return l?l.price:0; }
+function storeReturnedQty(id){ return DB.returns.filter(r=>r.storeId===id).reduce((s,r)=>s+r.qty,0); }
+function storeDeliveredQty(id){ return DB.deliveries.filter(d=>d.storeId===id).reduce((s,d)=>s+d.qty,0); }
+
+// ═══════════════ TOAST ═══════════════
+function toast(msg, type='success'){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-icon').innerHTML=type==='success'
+    ?'<polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" fill="none"/>'
+    :'<line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2.5"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2.5"/>';
+  t.className='toast show'+(type==='error'?' error':'');
+  setTimeout(()=>t.className='toast',2500);
+}
+
+// ═══════════════ MODALS ═══════════════
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+
+function openAddBottleBatchModal(){
+  document.getElementById('btl-date').value=today();
+  ['btl-qty','btl-bottle-price','btl-label-price','btl-supplier','btl-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('btl-bottle-total').textContent='0.00';
+  document.getElementById('btl-label-total').textContent='0.00';
+  document.getElementById('btl-grand-total').textContent='0.00';
+  document.getElementById('bottle-modal-stock').textContent=fmtN(bottleStockLeft());
+  openModal('modal-add-bottle');
+}
+
+function openAddPurchaseModal(){
+  document.getElementById('pur-date').value=today();
+  ['pur-qty','pur-cost','pur-supplier','pur-total'].forEach(id=>document.getElementById(id).value='');
+  openModal('modal-add-purchase');
+}
+
+function openAddDeliveryModal(){
+  document.getElementById('del-date').value=today();
+  ['del-qty','del-price','del-total','del-paid-now'].forEach(id=>document.getElementById(id).value='');
+  setPayType('cash');
+  openModal('modal-add-delivery');
+}
+
+function openPaymentModal(){
+  if(!currentStoreId)return;
+  document.getElementById('pay-date').value=today();
+  document.getElementById('pay-amount').value='';
+  document.getElementById('pay-note').value='';
+  document.getElementById('modal-debt-amount').textContent=fmt(storeDebt(currentStoreId));
+  openModal('modal-payment');
+}
+
+function openReturnModal(){
+  document.getElementById('ret-date').value=today();
+  document.getElementById('ret-qty').value='';
+  document.getElementById('ret-reason').value='';
+  openModal('modal-return');
+}
+
+// ─── Pay type ───
+function setPayType(type){
+  currentPayType=type;
+  ['cash','credit','partial'].forEach(t=>{
+    document.getElementById('pt-'+t).className='ptype-btn'+(t===type?' sel-'+t:'');
+  });
+  document.getElementById('partial-amount-wrap').style.display=type==='partial'?'block':'none';
+}
+
+function updateDeliveryTotal(){
+  const q=parseFloat(document.getElementById('del-qty').value)||0;
+  const p=parseFloat(document.getElementById('del-price').value)||0;
+  document.getElementById('del-total').value=q*p>0?fmt(q*p):'';
+}
+
+function updateBottleTotal(){
+  const q=parseFloat(document.getElementById('btl-qty').value)||0;
+  const bp=parseFloat(document.getElementById('btl-bottle-price').value)||0;
+  const lp=parseFloat(document.getElementById('btl-label-price').value)||0;
+  document.getElementById('btl-bottle-total').textContent=fmt(q*bp);
+  document.getElementById('btl-label-total').textContent=fmt(q*lp);
+  document.getElementById('btl-grand-total').textContent=fmt(q*(bp+lp));
+}
+
+['pur-qty','pur-cost'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{
+  const q=parseFloat(document.getElementById('pur-qty').value)||0;
+  const c=parseFloat(document.getElementById('pur-cost').value)||0;
+  document.getElementById('pur-total').value=q*c>0?fmt(q*c):'';
+}));
+
+// ═══════════════ SAVE ACTIONS ═══════════════
+function saveNewStore(){
+  const name=document.getElementById('ns-name').value.trim();
+  if(!name){toast('Dükan adyny ýazyň','error');return;}
+  DB.stores.push({id:uid(),name,contact:document.getElementById('ns-contact').value.trim(),phone:document.getElementById('ns-phone').value.trim(),addr:document.getElementById('ns-addr').value.trim(),createdAt:today()});
+  save();closeModal('modal-add-store');renderStoresNav();toast('Dükan goşuldy');
+}
+
+function saveBottleBatch(){
+  const date=document.getElementById('btl-date').value;
+  const qty=parseInt(document.getElementById('btl-qty').value);
+  const bottlePrice=parseFloat(document.getElementById('btl-bottle-price').value)||0;
+  const labelPrice=parseFloat(document.getElementById('btl-label-price').value)||0;
+  if(!date||!qty||qty<1){toast('Sene we mukdary giriziň','error');return;}
+  if(bottlePrice<=0&&labelPrice<=0){toast('Bahalary giriziň','error');return;}
+  DB.bottleBatches.push({id:uid(),date,qty,bottlePrice,labelPrice,supplier:document.getElementById('btl-supplier').value.trim(),note:document.getElementById('btl-note').value.trim()});
+  save();closeModal('modal-add-bottle');renderBottlesPage();toast('Baklažka gelip gowuşmasy goşuldy');
+}
+
+function savePurchase(){
+  const date=document.getElementById('pur-date').value;
+  const qty=parseInt(document.getElementById('pur-qty').value);
+  const cost=parseFloat(document.getElementById('pur-cost').value);
+  if(!date||!qty||!cost){toast('Ähli ýerleri dolduryň','error');return;}
+  DB.purchases.push({id:uid(),date,qty,cost,supplier:document.getElementById('pur-supplier').value.trim()});
+  save();closeModal('modal-add-purchase');renderPurchasesPage();toast('Satyn alyş goşuldy');
+}
+
+function saveDelivery(){
+  if(!currentStoreId)return;
+  const date=document.getElementById('del-date').value;
+  const qty=parseInt(document.getElementById('del-qty').value);
+  const price=parseFloat(document.getElementById('del-price').value);
+  if(!date||!qty||!price){toast('Ähli ýerleri dolduryň','error');return;}
+  const total=qty*price;
+  let paidNow=0;
+  if(currentPayType==='cash') paidNow=total;
+  else if(currentPayType==='partial'){
+    paidNow=parseFloat(document.getElementById('del-paid-now').value)||0;
+    if(paidNow>=total){toast('Öňünden töleg umumy summadan köp bolup bilmez','error');return;}
+  }
+  DB.deliveries.push({id:uid(),storeId:currentStoreId,date,qty,price,paidNow,payType:currentPayType});
+  save();closeModal('modal-add-delivery');renderStorePage(currentStoreId);renderStoresNav();toast('Iberme ýazyldy');
+}
+
+function savePayment(){
+  if(!currentStoreId)return;
+  const amount=parseFloat(document.getElementById('pay-amount').value);
+  const date=document.getElementById('pay-date').value;
+  if(!amount||amount<=0){toast('Mukdar giriziň','error');return;}
+  const debt=storeDebt(currentStoreId);
+  if(amount>debt+0.01){toast(`Mukdar bergiden köp (${fmt(debt)})`,'error');return;}
+  DB.payments.push({id:uid(),storeId:currentStoreId,date,amount,note:document.getElementById('pay-note').value.trim()});
+  save();closeModal('modal-payment');renderStorePage(currentStoreId);renderStoresNav();renderDashboard();toast('Töleg ýazyldy');
+}
+
+function saveReturn(){
+  if(!currentStoreId)return;
+  const qty=parseInt(document.getElementById('ret-qty').value);
+  const date=document.getElementById('ret-date').value;
+  if(!qty||!date){toast('Ýerleri dolduryň','error');return;}
+  DB.returns.push({id:uid(),storeId:currentStoreId,date,qty,price:getDeliveryPrice(currentStoreId),reason:document.getElementById('ret-reason').value.trim()});
+  save();closeModal('modal-return');renderStorePage(currentStoreId);toast('Gaýtarma ýazyldy');
+}
+
+function deleteBottleBatch(id){if(!confirm('Pozmaly?'))return;DB.bottleBatches=DB.bottleBatches.filter(b=>b.id!==id);save();renderBottlesPage();}
+function deleteDelivery(id){if(!confirm('Ibermäni pozmaly?'))return;DB.deliveries=DB.deliveries.filter(d=>d.id!==id);save();renderStorePage(currentStoreId);renderStoresNav();}
+function deleteStore(id){if(!confirm('Dükany we ähli maglumatlary pozmaly?'))return;DB.stores=DB.stores.filter(s=>s.id!==id);DB.deliveries=DB.deliveries.filter(d=>d.storeId!==id);DB.payments=DB.payments.filter(p=>p.storeId!==id);DB.returns=DB.returns.filter(r=>r.storeId!==id);save();renderStoresNav();showPage('dashboard');}
+function deletePurchase(id){if(!confirm('Pozmaly?'))return;DB.purchases=DB.purchases.filter(p=>p.id!==id);save();renderPurchasesPage();}
+function deletePayment(id){if(!confirm('Pozmaly?'))return;DB.payments=DB.payments.filter(p=>p.id!==id);save();renderStorePage(currentStoreId);renderStoresNav();}
+function deleteReturn(id){if(!confirm('Pozmaly?'))return;DB.returns=DB.returns.filter(r=>r.id!==id);save();renderStorePage(currentStoreId);}
+
+// ═══════════════ NAVIGATION ═══════════════
+function showPage(name, storeId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.store-nav').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const navIdx={dashboard:0,bottles:1,purchases:2,analytics:3,reports:4};
+  if(navIdx[name]!==undefined) document.querySelectorAll('.nav-item')[navIdx[name]].classList.add('active');
+  if(name==='dashboard') renderDashboard();
+  if(name==='bottles') renderBottlesPage();
+  if(name==='purchases') renderPurchasesPage();
+  if(name==='analytics') renderAnalyticsPage();
+  if(name==='reports') renderReportsPage();
+  if(name==='store'&&storeId){
+    currentStoreId=storeId;
+    document.getElementById('page-store').classList.add('active');
+    const el=document.querySelector(`.store-nav[data-id="${storeId}"]`);
+    if(el) el.classList.add('active');
+    renderStorePage(storeId);
+  }
+}
+
+// ═══════════════ STORES NAV ═══════════════
+function renderStoresNav(){
+  const el=document.getElementById('stores-nav');
+  if(!DB.stores.length){el.innerHTML='<div style="font-size:12px;color:var(--text3);padding:4px 10px 8px;">Dükan ýok</div>';return;}
+  const sa=document.getElementById('page-store').classList.contains('active');
+  el.innerHTML=DB.stores.map(s=>{
+    const debt=storeDebt(s.id);
+    return`<div class="store-nav ${sa&&currentStoreId===s.id?'active':''}" data-id="${s.id}" onclick="showPage('store','${s.id}')">
+      <div class="store-dot"></div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${s.name}</span>
+      ${debt>0?`<span class="store-debt-tag">${fmt(debt)}</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════ ICONS ═══════════════
+const IC={
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`,
+  truck:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>`,
+  card:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  back:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>`,
+  bottle:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 4H8L9 3z"/><path d="M8 7v10a3 3 0 006 0V7"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`,
+};
+
+function payTypeBadge(pt){
+  const m={cash:['badge-cash','Nagt'],credit:['badge-credit','Karz'],partial:['badge-partial','Bölekleýin']};
+  const[cls,lbl]=m[pt]||m.cash;
+  return`<span class="badge ${cls}">${lbl}</span>`;
+}
+
+// ═══════════════ DASHBOARD ═══════════════
+function renderDashboard(){
+  const totalRevenue=DB.deliveries.reduce((s,d)=>s+d.qty*d.price,0);
+  const totalCost=DB.purchases.reduce((s,p)=>s+p.qty*p.cost,0);
+  const totalPaid=DB.deliveries.reduce((s,d)=>s+d.paidNow,0)+DB.payments.reduce((s,p)=>s+p.amount,0);
+  const totalDebt=DB.stores.reduce((s,st)=>s+storeDebt(st.id),0);
+  const totalReturns=DB.returns.reduce((s,r)=>s+r.qty,0);
+  const totalDelivered=DB.deliveries.reduce((s,d)=>s+d.qty,0);
+  const totalBought=DB.purchases.reduce((s,p)=>s+p.qty,0);
+  const bottleLeft=bottleStockLeft();
+  const profit=totalPaid-totalCost;
+
+  document.getElementById('dash-metrics').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Umumy girdeji</div><div class="metric-val blue">${fmt(totalRevenue)}</div><div class="metric-sub">Ähli ibermelerde</div></div>
+    <div class="metric-card"><div class="metric-label">Alnan pul</div><div class="metric-val green">${fmt(totalPaid)}</div><div class="metric-sub">Nagt + tölegler</div></div>
+    <div class="metric-card"><div class="metric-label">Umumy bergi</div><div class="metric-val red">${fmt(totalDebt)}</div><div class="metric-sub">${DB.stores.filter(s=>storeDebt(s.id)>0).length} dükan</div></div>
+    <div class="metric-card"><div class="metric-label">Peýda (hakyky)</div><div class="metric-val ${profit>=0?'green':'red'}">${fmt(profit)}</div><div class="metric-sub">Alnan − özüne düşüş</div></div>
+    <div class="metric-card"><div class="metric-label">Çal ammary</div><div class="metric-val">${fmtN(totalBought-totalDelivered)}</div><div class="metric-sub">çüýşe galdy</div></div>
+    <div class="metric-card" style="cursor:pointer;" onclick="showPage('bottles')"><div class="metric-label">Baklažka</div><div class="metric-val teal">${fmtN(bottleLeft)}</div><div class="metric-sub">sany galdy</div></div>
+    <div class="metric-card"><div class="metric-label">Gaýtarmalar</div><div class="metric-val amber">${fmtN(totalReturns)}</div><div class="metric-sub">çüýşe yzyna geldi</div></div>
+  `;
+
+  const debtsEl=document.getElementById('dash-debts-list');
+  const withDebt=DB.stores.filter(s=>storeDebt(s.id)>0).sort((a,b)=>storeDebt(b.id)-storeDebt(a.id));
+  if(!withDebt.length){debtsEl.innerHTML=`<div class="empty"><div class="empty-icon">${IC.check}</div><div class="empty-title">Bergi ýok</div></div>`;}
+  else debtsEl.innerHTML=withDebt.map(s=>{
+    const debt=storeDebt(s.id),sold=DB.deliveries.filter(d=>d.storeId===s.id).reduce((x,d)=>x+d.qty*d.price,0);
+    const pct=sold>0?Math.min(100,(sold-debt)/sold*100):0;
+    const clr=pct<50?'var(--red)':pct<80?'var(--amber)':'var(--green)';
+    return`<div onclick="showPage('store','${s.id}')" style="cursor:pointer;padding:11px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+        <div style="font-size:13px;font-weight:600;">${s.name}</div>
+        <div style="font-family:var(--mono);font-size:13px;color:var(--red);font-weight:600;">${fmt(debt)}</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct.toFixed(0)}%;background:${clr};"></div></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px;">${pct.toFixed(0)}% tölendi</div>
+    </div>`;
+  }).join('');
+
+  const months={};
+  DB.deliveries.forEach(d=>{const m=d.date.slice(0,7);if(!months[m])months[m]={rev:0,paid:0};months[m].rev+=d.qty*d.price;months[m].paid+=d.paidNow;});
+  DB.payments.forEach(p=>{const m=p.date.slice(0,7);if(!months[m])months[m]={rev:0,paid:0};months[m].paid+=p.amount;});
+  const mKeys=Object.keys(months).sort().slice(-6);
+  const maxVal=Math.max(...mKeys.map(m=>months[m].rev),1);
+  const chartEl=document.getElementById('dash-chart');
+  if(!mKeys.length){chartEl.innerHTML='<div class="empty"><div class="empty-title">Maglumat ýok</div></div>';}
+  else chartEl.innerHTML=`<div class="bar-chart">${mKeys.map(m=>{
+    const p1=(months[m].rev/maxVal*90).toFixed(0);
+    const p2=(months[m].paid/maxVal*90).toFixed(0);
+    return`<div class="bar-wrap">
+      <div style="font-size:9px;color:var(--text3);font-family:var(--mono);white-space:nowrap;">${fmt(months[m].rev)}</div>
+      <div style="width:100%;height:80px;display:flex;align-items:flex-end;gap:2px;">
+        <div style="flex:1;background:rgba(44,82,130,.18);height:${p1}%;border-radius:3px 3px 0 0;"></div>
+        <div style="flex:1;background:var(--green);opacity:.7;height:${p2}%;border-radius:3px 3px 0 0;"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px;">${monthLabel(m)}</div>
+    </div>`;
+  }).join('')}</div>
+  <div class="chart-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:rgba(44,82,130,.18);"></div>Girdeji</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green);opacity:.7;"></div>Alnan</div>
+  </div>`;
+
+  const ops=[];
+  DB.deliveries.forEach(d=>ops.push({date:d.date,type:'delivery',store:getStore(d.storeId).name,amount:d.qty*d.price,payType:d.payType,qty:d.qty}));
+  DB.payments.forEach(p=>ops.push({date:p.date,type:'payment',store:getStore(p.storeId).name,amount:p.amount}));
+  DB.returns.forEach(r=>ops.push({date:r.date,type:'return',store:getStore(r.storeId).name,qty:r.qty}));
+  DB.bottleBatches.forEach(b=>ops.push({date:b.date,type:'bottle',store:b.supplier||'Üpjünçi',qty:b.qty,amount:b.qty*(b.bottlePrice+b.labelPrice)}));
+  ops.sort((a,b)=>b.date.localeCompare(a.date));
+  const recEl=document.getElementById('dash-recent');
+  if(!ops.length){recEl.innerHTML=`<div class="empty"><div class="empty-icon">${IC.truck}</div><div class="empty-title">Amal ýok</div></div>`;return;}
+  recEl.innerHTML='<div class="table-wrap"><table><thead><tr><th>Sene</th><th>Görnüşi</th><th>Dükan / Üpjünçi</th><th>Mukdary</th><th>Pul</th></tr></thead><tbody>'
+    +ops.slice(0,18).map(o=>`<tr>
+      <td class="mono" style="color:var(--text3)">${o.date}</td>
+      <td>${o.type==='delivery'?payTypeBadge(o.payType||'cash'):o.type==='payment'?'<span class="badge badge-paid">Töleg</span>':o.type==='bottle'?'<span class="badge badge-bottle">Baklažka</span>':'<span class="badge badge-return">Gaýtarma</span>'}</td>
+      <td style="font-weight:500;">${o.store}</td>
+      <td class="mono">${o.qty?fmtN(o.qty)+' sany':'—'}</td>
+      <td class="mono" style="font-weight:600;color:${o.type==='payment'?'var(--green)':o.type==='bottle'?'var(--teal)':o.type==='return'?'var(--purple)':'var(--text)'};">${o.amount?fmt(o.amount):'—'}</td>
+    </tr>`).join('')+'</tbody></table></div>';
+}
+
+// ═══════════════ BOTTLES PAGE ═══════════════
+function renderBottlesPage(){
+  const totalIn=bottleStockIn();
+  const totalUsed=bottleStockUsed();
+  const totalLeft=bottleStockLeft();
+  const totalBottleCost=DB.bottleBatches.reduce((s,b)=>s+b.qty*b.bottlePrice,0);
+  const totalLabelCost=DB.bottleBatches.reduce((s,b)=>s+b.qty*b.labelPrice,0);
+  const totalCombined=totalBottleCost+totalLabelCost;
+  const avgBottle=totalIn>0?totalBottleCost/totalIn:0;
+  const avgLabel=totalIn>0?totalLabelCost/totalIn:0;
+
+  document.getElementById('bottles-metrics').innerHTML=`
+    <div class="metric-card" style="border-color:rgba(15,118,110,.2);background:var(--teal-bg);">
+      <div class="metric-label">Ätiýaçlyk</div>
+      <div class="metric-val teal">${fmtN(totalLeft)} sany</div>
+      <div class="metric-sub">häzir bar</div>
+    </div>
+    <div class="metric-card"><div class="metric-label">Jemi gelip gowuşan</div><div class="metric-val">${fmtN(totalIn)} sany</div></div>
+    <div class="metric-card"><div class="metric-label">Ulanylan</div><div class="metric-val">${fmtN(totalUsed)} sany</div><div class="metric-sub">ibermelere sarp edildi</div></div>
+    <div class="metric-card"><div class="metric-label">Baklažka çykdajysy</div><div class="metric-val teal">${fmt(totalBottleCost)}</div><div class="metric-sub">Ortaça: ${fmt(avgBottle)}/sany</div></div>
+    <div class="metric-card"><div class="metric-label">Naklýka çykdajysy</div><div class="metric-val amber">${fmt(totalLabelCost)}</div><div class="metric-sub">Ortaça: ${fmt(avgLabel)}/sany</div></div>
+    <div class="metric-card"><div class="metric-label">Jemi çykdajy</div><div class="metric-val red">${fmt(totalCombined)}</div><div class="metric-sub">Baklažka + naklýka</div></div>
+  `;
+
+  // Stock level banner
+  const pct=totalIn>0?Math.min(100,totalLeft/totalIn*100):0;
+  const bannerColor=totalLeft<20?'var(--red)':totalLeft<50?'var(--amber)':'var(--teal)';
+  document.getElementById('bottles-banner').innerHTML=`
+    <div class="bottle-banner" style="${totalLeft<20?'background:var(--red-bg);border-color:#f0c0c0;':''}">
+      <div class="bottle-banner-item">
+        <div class="bottle-banner-label" style="color:${bannerColor};">Häzirki ätiýaçlyk</div>
+        <div class="bottle-banner-val" style="color:${bannerColor};">${fmtN(totalLeft)}</div>
+        <div class="bottle-banner-sub">sany baklažka bar</div>
+      </div>
+      <div style="flex:1;max-width:300px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;">Ulanyş derejesi: ${pct.toFixed(0)}% sarp edildi</div>
+        <div class="progress-bar" style="height:8px;"><div class="progress-fill" style="width:${pct.toFixed(0)}%;background:${bannerColor};"></div></div>
+        ${totalLeft<20?'<div style="font-size:12px;color:var(--red);margin-top:6px;font-weight:600;">Ätiýaçlyk az — täze sargyt ediň!</div>':''}
+      </div>
+      <div class="bottle-banner-item">
+        <div class="bottle-banner-label">1 sanynyň bahasy</div>
+        <div class="bottle-banner-val" style="font-size:18px;color:var(--text);">${fmt(bottleAvgCostPerUnit())}</div>
+        <div class="bottle-banner-sub">baklažka + naklýka</div>
+      </div>
+    </div>
+  `;
+
+  const tbl=document.getElementById('bottles-table');
+  if(!DB.bottleBatches.length){
+    tbl.innerHTML=`<div class="empty"><div class="empty-icon">${IC.bottle}</div><div class="empty-title">Gelip gowuşma ýok</div><div class="empty-sub">Ýokarky düwmä basyp täze gelip gowuşma goşuň</div></div>`;
+    return;
+  }
+  const sorted=[...DB.bottleBatches].sort((a,b)=>b.date.localeCompare(a.date));
+  tbl.innerHTML='<table><thead><tr><th>Sene</th><th>Üpjünçi</th><th>Mukdary</th><th>Baklažka/sany</th><th>Naklýka/sany</th><th>Baklažka jemi</th><th>Naklýka jemi</th><th>Umumy jemi</th><th>Bellik</th><th></th></tr></thead><tbody>'
+    +sorted.map(b=>`<tr>
+      <td class="mono" style="color:var(--text3);">${b.date}</td>
+      <td style="font-weight:500;">${b.supplier||'—'}</td>
+      <td class="mono" style="color:var(--teal);font-weight:600;">+${fmtN(b.qty)} sany</td>
+      <td class="mono">${fmt(b.bottlePrice)}</td>
+      <td class="mono">${fmt(b.labelPrice)}</td>
+      <td class="mono" style="color:var(--teal);">${fmt(b.qty*b.bottlePrice)}</td>
+      <td class="mono" style="color:var(--amber);">${fmt(b.qty*b.labelPrice)}</td>
+      <td class="mono" style="font-weight:700;color:var(--accent);">${fmt(b.qty*(b.bottlePrice+b.labelPrice))}</td>
+      <td style="color:var(--text3);font-size:12px;">${b.note||'—'}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="deleteBottleBatch('${b.id}')">Poz</button></td>
+    </tr>`).join('')+'</tbody></table>';
+}
+
+// ═══════════════ PURCHASES PAGE ═══════════════
+function renderPurchasesPage(){
+  const total=DB.purchases.reduce((s,p)=>s+p.qty*p.cost,0);
+  const totalQty=DB.purchases.reduce((s,p)=>s+p.qty,0);
+  const totalDelivered=DB.deliveries.reduce((s,d)=>s+d.qty,0);
+  const avgCost=totalQty>0?total/totalQty:0;
+  document.getElementById('purchases-metrics').innerHTML=`
+    <div class="metric-card"><div class="metric-label">Satyn alnan (çal)</div><div class="metric-val">${fmtN(totalQty)} sany</div></div>
+    <div class="metric-card"><div class="metric-label">Jemi özüne düşüş</div><div class="metric-val red">${fmt(total)}</div></div>
+    <div class="metric-card"><div class="metric-label">Ortaça baha</div><div class="metric-val">${fmt(avgCost)}</div></div>
+    <div class="metric-card"><div class="metric-label">Çal ammary</div><div class="metric-val green">${fmtN(totalQty-totalDelivered)} sany</div></div>
+  `;
+  const tbl=document.getElementById('purchases-table');
+  if(!DB.purchases.length){tbl.innerHTML=`<div class="empty"><div class="empty-icon">${IC.truck}</div><div class="empty-title">Satyn alyş ýok</div></div>`;return;}
+  tbl.innerHTML='<table><thead><tr><th>Sene</th><th>Üpjünçi</th><th>Mukdary</th><th>Özüne düşüş/sany</th><th>Jemi</th><th></th></tr></thead><tbody>'
+    +[...DB.purchases].sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<tr>
+      <td class="mono" style="color:var(--text3);">${p.date}</td>
+      <td>${p.supplier||'—'}</td>
+      <td class="mono">${fmtN(p.qty)} sany</td>
+      <td class="mono">${fmt(p.cost)}</td>
+      <td class="mono" style="font-weight:700;color:var(--accent);">${fmt(p.qty*p.cost)}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="deletePurchase('${p.id}')">Poz</button></td>
+    </tr>`).join('')+'</tbody></table>';
+}
+
+// ═══════════════ STORE PAGE ═══════════════
+function renderStorePage(storeId){
+  const store=getStore(storeId);
+  const debt=storeDebt(storeId);
+  const dQty=storeDeliveredQty(storeId);
+  const rQty=storeReturnedQty(storeId);
+  const totalRev=DB.deliveries.filter(d=>d.storeId===storeId).reduce((s,d)=>s+d.qty*d.price,0);
+  const totalPaid=DB.deliveries.filter(d=>d.storeId===storeId).reduce((s,d)=>s+d.paidNow,0)+DB.payments.filter(p=>p.storeId===storeId).reduce((s,p)=>s+p.amount,0);
+  document.getElementById('store-page-title').textContent=store.name;
+  document.getElementById('store-page-sub').textContent=store.addr||store.contact||'Dükan';
+  const ini=store.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('store-page-body').innerHTML=`
+    <div class="store-hcard">
+      <div class="store-avatar">${ini}</div>
+      <div>
+        <div class="store-info-title">${store.name}</div>
+        <div class="store-info-sub">${[store.contact,store.phone,store.addr].filter(Boolean).join(' · ')||'Aragatnaşyk ýok'}</div>
+      </div>
+      <div class="store-hactions">
+        <button class="btn btn-ghost btn-sm" onclick="openReturnModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>Gaýtarma
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="deleteStore('${storeId}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>Poz
+        </button>
+      </div>
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-label">Iberilen</div><div class="metric-val blue">${fmtN(dQty)} sany</div></div>
+      <div class="metric-card"><div class="metric-label">Gaýtarylan</div><div class="metric-val amber">${fmtN(rQty)} sany</div></div>
+      <div class="metric-card"><div class="metric-label">Satuwda</div><div class="metric-val">${fmtN(dQty-rQty)} sany</div></div>
+      <div class="metric-card"><div class="metric-label">Girdeji</div><div class="metric-val">${fmt(totalRev)}</div></div>
+      <div class="metric-card"><div class="metric-label">Alnan</div><div class="metric-val green">${fmt(totalPaid)}</div></div>
+      <div class="metric-card"><div class="metric-label">Bergi</div><div class="metric-val ${debt>0?'red':'green'}">${fmt(debt)}</div></div>
+    </div>
+    ${debt>0?`<div class="debt-banner">
+      <div><div class="debt-label">Häzirki bergi</div><div class="debt-amount">${fmt(debt)}</div></div>
+      <button class="btn btn-success" onclick="openPaymentModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Töleg kabul et
+      </button>
+    </div>`:''}
+    <div class="inner-tabs">
+      <button class="inner-tab active" onclick="showInner('deliveries')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/></svg>Ibermelere
+      </button>
+      <button class="inner-tab" onclick="showInner('payments')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Tölegler
+      </button>
+      <button class="inner-tab" onclick="showInner('returns')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>Gaýtarmalar
+      </button>
+    </div>
+    <div id="inner-deliveries" class="inner-section active">${renderDeliveriesTable(storeId)}</div>
+    <div id="inner-payments" class="inner-section">${renderPaymentsTable(storeId)}</div>
+    <div id="inner-returns" class="inner-section">${renderReturnsTable(storeId)}</div>
+  `;
+}
+
+function showInner(n){
+  const tabs=['deliveries','payments','returns'];
+  document.querySelectorAll('.inner-tab').forEach((t,i)=>t.classList.toggle('active',tabs[i]===n));
+  document.querySelectorAll('.inner-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('inner-'+n).classList.add('active');
+}
+
+function renderDeliveriesTable(sid){
+  const list=[...DB.deliveries].filter(d=>d.storeId===sid).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!list.length)return`<div class="empty"><div class="empty-icon">${IC.truck}</div><div class="empty-title">Iberme ýok</div><div class="empty-sub">«Täze iberme» düwmesine basyň</div></div>`;
+  return'<div class="table-wrap"><table><thead><tr><th>Sene</th><th>Mukdar</th><th>Baha/sany</th><th>Jemi</th><th>Töleg</th><th>Tölendi</th><th>Galdy</th><th></th></tr></thead><tbody>'
+    +list.map(d=>{const t=d.qty*d.price,rem=Math.max(0,t-d.paidNow);return`<tr>
+      <td class="mono" style="color:var(--text3);">${d.date}</td>
+      <td class="mono">${fmtN(d.qty)} sany</td>
+      <td class="mono">${fmt(d.price)}</td>
+      <td class="mono" style="font-weight:600;">${fmt(t)}</td>
+      <td>${payTypeBadge(d.payType||'cash')}</td>
+      <td class="mono" style="color:var(--green);">${fmt(d.paidNow)}</td>
+      <td class="mono" style="color:${rem>0?'var(--red)':'var(--green)'};">${fmt(rem)}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="deleteDelivery('${d.id}')">Poz</button></td>
+    </tr>`;}).join('')+'</tbody></table></div>';
+}
+
+function renderPaymentsTable(sid){
+  const list=[...DB.payments].filter(p=>p.storeId===sid).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!list.length)return`<div class="empty"><div class="empty-icon">${IC.card}</div><div class="empty-title">Töleg ýok</div></div>`;
+  return'<div class="table-wrap"><table><thead><tr><th>Sene</th><th>Mukdary</th><th>Bellik</th><th></th></tr></thead><tbody>'
+    +list.map(p=>`<tr>
+      <td class="mono" style="color:var(--text3);">${p.date}</td>
+      <td class="mono" style="color:var(--green);font-weight:700;">+${fmt(p.amount)}</td>
+      <td style="color:var(--text2);">${p.note||'—'}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="deletePayment('${p.id}')">Poz</button></td>
+    </tr>`).join('')+'</tbody></table></div>';
+}
+
+function renderReturnsTable(sid){
+  const list=[...DB.returns].filter(r=>r.storeId===sid).sort((a,b)=>b.date.localeCompare(a.date));
+  if(!list.length)return`<div class="empty"><div class="empty-icon">${IC.back}</div><div class="empty-title">Gaýtarma ýok</div></div>`;
+  return'<div class="table-wrap"><table><thead><tr><th>Sene</th><th>Mukdary</th><th>Baha/sany</th><th>Jemi</th><th>Sebäp</th><th></th></tr></thead><tbody>'
+    +list.map(r=>`<tr>
+      <td class="mono" style="color:var(--text3);">${r.date}</td>
+      <td class="mono" style="color:var(--purple);">${fmtN(r.qty)} sany</td>
+      <td class="mono">${fmt(r.price)}</td>
+      <td class="mono" style="color:var(--purple);">${fmt(r.qty*r.price)}</td>
+      <td style="color:var(--text2);">${r.reason||'—'}</td>
+      <td><button class="btn btn-danger btn-xs" onclick="deleteReturn('${r.id}')">Poz</button></td>
+    </tr>`).join('')+'</tbody></table></div>';
+}
+
+// ═══════════════ ANALYTICS ═══════════════
+function renderAnalyticsPage(){
+  const sel=document.getElementById('analytics-month-select');
+  const months=new Set();
+  [...DB.deliveries,...DB.purchases,...DB.payments,...DB.bottleBatches].forEach(x=>months.add(x.date.slice(0,7)));
+  const mArr=[...months].sort().reverse();
+  if(!sel.options.length){
+    sel.innerHTML=mArr.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');
+    if(mArr.length) sel.value=mArr[0];
+  }
+  const month=sel.value||(mArr[0]||'');
+  if(!month){document.getElementById('analytics-body').innerHTML='<div class="empty"><div class="empty-title">Maglumat ýok</div></div>';return;}
+  const delivs=DB.deliveries.filter(d=>d.date.startsWith(month));
+  const purch=DB.purchases.filter(p=>p.date.startsWith(month));
+  const pays=DB.payments.filter(p=>p.date.startsWith(month));
+  const rets=DB.returns.filter(r=>r.date.startsWith(month));
+  const btls=DB.bottleBatches.filter(b=>b.date.startsWith(month));
+  const revenue=delivs.reduce((s,d)=>s+d.qty*d.price,0);
+  const cost=purch.reduce((s,p)=>s+p.qty*p.cost,0);
+  const paidImm=delivs.reduce((s,d)=>s+d.paidNow,0);
+  const paidLater=pays.reduce((s,p)=>s+p.amount,0);
+  const totalPaid=paidImm+paidLater;
+  const debt=revenue-totalPaid;
+  const profit=totalPaid-cost;
+  const retQty=rets.reduce((s,r)=>s+r.qty,0);
+  const retVal=rets.reduce((s,r)=>s+r.qty*r.price,0);
+  const qty=delivs.reduce((s,d)=>s+d.qty,0);
+  const btlQty=btls.reduce((s,b)=>s+b.qty,0);
+  const btlCost=btls.reduce((s,b)=>s+b.qty*(b.bottlePrice+b.labelPrice),0);
+  const cashD=delivs.filter(d=>d.payType==='cash');
+  const creditD=delivs.filter(d=>d.payType==='credit');
+  const partialD=delivs.filter(d=>d.payType==='partial');
+
+  document.getElementById('analytics-body').innerHTML=`
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-label">Iberilen</div><div class="metric-val">${fmtN(qty)} sany</div></div>
+      <div class="metric-card"><div class="metric-label">Girdeji</div><div class="metric-val blue">${fmt(revenue)}</div></div>
+      <div class="metric-card"><div class="metric-label">Alnan</div><div class="metric-val green">${fmt(totalPaid)}</div></div>
+      <div class="metric-card"><div class="metric-label">Aýlyk bergi</div><div class="metric-val ${debt>0?'red':'green'}">${fmt(Math.max(0,debt))}</div></div>
+      <div class="metric-card"><div class="metric-label">Özüne düşüş</div><div class="metric-val">${fmt(cost)}</div></div>
+      <div class="metric-card"><div class="metric-label">Peýda</div><div class="metric-val ${profit>=0?'green':'red'}">${fmt(profit)}</div></div>
+      <div class="metric-card"><div class="metric-label">Baklažka geldi</div><div class="metric-val teal">${fmtN(btlQty)} sany</div><div class="metric-sub">${fmt(btlCost)} çykdajy</div></div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Töleg görnüşleri</div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;"><span class="badge badge-cash">Nagt</span><span class="mono" style="font-size:12px;">${cashD.length} iberme · ${fmt(cashD.reduce((s,d)=>s+d.qty*d.price,0))}</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;"><span class="badge badge-credit">Karz</span><span class="mono" style="font-size:12px;">${creditD.length} iberme · ${fmt(creditD.reduce((s,d)=>s+d.qty*d.price,0))}</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;"><span class="badge badge-partial">Bölekleýin</span><span class="mono" style="font-size:12px;">${partialD.length} iberme · ${fmt(partialD.reduce((s,d)=>s+d.qty*d.price,0))}</span></div>
+        </div>
+        <hr class="divider">
+        <div style="display:flex;align-items:center;justify-content:space-between;"><span class="badge badge-return">Gaýtarmalar</span><span class="mono" style="font-size:12px;">${fmtN(retQty)} sany · ${fmt(retVal)}</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Bu aý tölegler</div>
+        ${pays.length?pays.sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="pay-item">
+          <div class="pay-dot" style="background:var(--green);"></div>
+          <div style="flex:1;"><div style="font-size:13px;font-weight:500;">${getStore(p.storeId).name}</div><div style="font-size:11px;color:var(--text3);">${p.date}${p.note?' · '+p.note:''}</div></div>
+          <div class="mono" style="color:var(--green);font-weight:700;">+${fmt(p.amount)}</div>
+        </div>`).join(''):'<div style="color:var(--text3);font-size:13px;padding:8px 0;">Gelim ýok</div>'}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>${monthLabel(month)} — dükanlar</div>
+      <div class="table-wrap"><table><thead><tr><th>Dükan</th><th>Iberme</th><th>Çüýşe</th><th>Girdeji</th><th>Alnan</th><th>Bergi</th><th>Gaýtarma</th></tr></thead><tbody>
+        ${DB.stores.map(s=>{
+          const sd=delivs.filter(d=>d.storeId===s.id);
+          if(!sd.length)return'';
+          const rev=sd.reduce((x,d)=>x+d.qty*d.price,0);
+          const paid=sd.reduce((x,d)=>x+d.paidNow,0)+pays.filter(p=>p.storeId===s.id).reduce((x,p)=>x+p.amount,0);
+          const d2=Math.max(0,rev-paid);
+          const ret=rets.filter(r=>r.storeId===s.id).reduce((x,r)=>x+r.qty,0);
+          return`<tr><td style="font-weight:600;cursor:pointer;color:var(--accent);" onclick="showPage('store','${s.id}')">${s.name}</td><td class="mono">${sd.length}</td><td class="mono">${fmtN(sd.reduce((x,d)=>x+d.qty,0))}</td><td class="mono">${fmt(rev)}</td><td class="mono" style="color:var(--green);">${fmt(paid)}</td><td class="mono" style="color:${d2>0?'var(--red)':'var(--green)'};">${fmt(d2)}</td><td class="mono" style="color:var(--purple);">${fmtN(ret)} sany</td></tr>`;
+        }).join('')}
+      </tbody></table></div>
+    </div>
+  `;
+}
+
+// ═══════════════ REPORTS ═══════════════
+function renderReportsPage(){
+  const body=document.getElementById('reports-body');
+  const allMonths=new Set();
+  [...DB.deliveries,...DB.purchases,...DB.bottleBatches].forEach(x=>allMonths.add(x.date.slice(0,7)));
+  const months=[...allMonths].sort().reverse();
+  body.innerHTML=`
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Aýlyk jemleýji hasabat</div>
+      <div class="table-wrap"><table><thead><tr><th>Aý</th><th>Satyn (sany)</th><th>Özüne düşüş</th><th>Baklažka</th><th>Iberilen</th><th>Girdeji</th><th>Alnan</th><th>Bergi</th><th>Peýda</th></tr></thead><tbody>
+        ${months.map(m=>{
+          const delivs=DB.deliveries.filter(d=>d.date.startsWith(m));
+          const purch=DB.purchases.filter(p=>p.date.startsWith(m));
+          const pays=DB.payments.filter(p=>p.date.startsWith(m));
+          const btls=DB.bottleBatches.filter(b=>b.date.startsWith(m));
+          const rev=delivs.reduce((s,d)=>s+d.qty*d.price,0);
+          const cost=purch.reduce((s,p)=>s+p.qty*p.cost,0);
+          const paidImm=delivs.reduce((s,d)=>s+d.paidNow,0);
+          const paidLater=pays.reduce((s,p)=>s+p.amount,0);
+          const totalPaid=paidImm+paidLater;
+          const debt=Math.max(0,rev-totalPaid);
+          const profit=totalPaid-cost;
+          const btlQty=btls.reduce((s,b)=>s+b.qty,0);
+          return`<tr>
+            <td style="font-weight:600;">${monthLabel(m)}</td>
+            <td class="mono">${fmtN(purch.reduce((s,p)=>s+p.qty,0))}</td>
+            <td class="mono">${fmt(cost)}</td>
+            <td class="mono" style="color:var(--teal);">+${fmtN(btlQty)}</td>
+            <td class="mono">${fmtN(delivs.reduce((s,d)=>s+d.qty,0))}</td>
+            <td class="mono">${fmt(rev)}</td>
+            <td class="mono" style="color:var(--green);">${fmt(totalPaid)}</td>
+            <td class="mono" style="color:${debt>0?'var(--red)':'var(--green)'};">${fmt(debt)}</td>
+            <td class="mono" style="color:${profit>=0?'var(--green)':'var(--red)'};">${fmt(profit)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 4H8L9 3z"/><path d="M8 7v10a3 3 0 006 0V7"/></svg>Baklažka ätiýaçlyk jemi</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+        <div class="metric-card"><div class="metric-label">Jemi geldi</div><div class="metric-val teal">${fmtN(bottleStockIn())} sany</div></div>
+        <div class="metric-card"><div class="metric-label">Ulanylan</div><div class="metric-val">${fmtN(bottleStockUsed())} sany</div></div>
+        <div class="metric-card"><div class="metric-label">Galdy</div><div class="metric-val ${bottleStockLeft()<20?'red':bottleStockLeft()<50?'amber':'teal'}">${fmtN(bottleStockLeft())} sany</div></div>
+        <div class="metric-card"><div class="metric-label">Jemi çykdajy</div><div class="metric-val red">${fmt(bottleTotalCost())}</div></div>
+        <div class="metric-card"><div class="metric-label">Ortaça 1 sany</div><div class="metric-val">${fmt(bottleAvgCostPerUnit())}</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Ähli dükanlar boýunça jemleýji</div>
+      <div class="table-wrap"><table><thead><tr><th>Dükan</th><th>Iberme</th><th>Iberilen</th><th>Gaýtarylan</th><th>Girdeji</th><th>Alnan</th><th>Häzirki bergi</th></tr></thead><tbody>
+        ${DB.stores.map(s=>{
+          const d=DB.deliveries.filter(x=>x.storeId===s.id);
+          const rev=d.reduce((x,v)=>x+v.qty*v.price,0);
+          const paid=d.reduce((x,v)=>x+v.paidNow,0)+DB.payments.filter(p=>p.storeId===s.id).reduce((x,p)=>x+p.amount,0);
+          const ret=storeReturnedQty(s.id);
+          const debt=storeDebt(s.id);
+          return`<tr>
+            <td style="font-weight:600;cursor:pointer;color:var(--accent);" onclick="showPage('store','${s.id}')">${s.name}</td>
+            <td class="mono">${d.length}</td>
+            <td class="mono">${fmtN(storeDeliveredQty(s.id))}</td>
+            <td class="mono" style="color:var(--purple);">${fmtN(ret)}</td>
+            <td class="mono">${fmt(rev)}</td>
+            <td class="mono" style="color:var(--green);">${fmt(paid)}</td>
+            <td class="mono" style="color:${debt>0?'var(--red)':'var(--green)'};">${fmt(debt)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody></table></div>
+    </div>
+  `;
+}
+
+// ═══════════════ INIT ═══════════════
+load();
+renderStoresNav();
+renderDashboard();
+</script>
+</body>
+</html>

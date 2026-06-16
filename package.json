@@ -1,0 +1,33 @@
+{
+  "name": "kaswa-jebel-caly",
+  "version": "1.0.0",
+  "description": "Kaswa Jebel Caly — Hasap ulgamy",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "rebuild": "electron-rebuild -f -w better-sqlite3"
+  },
+  "build": {
+    "appId": "com.kaswa.jebelcaly",
+    "productName": "Kaswa Jebel Caly",
+    "mac": {
+      "category": "public.app-category.business",
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "files": ["electron/**/*", "src/**/*", "db/**/*"],
+    "extraResources": []
+  },
+  "devDependencies": {
+    "electron": "^29.0.0",
+    "electron-builder": "^24.13.3",
+    "electron-rebuild": "^3.2.9"
+  },
+  "dependencies": {
+    "better-sqlite3": "^9.4.3"
+  }
+}
