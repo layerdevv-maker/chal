@@ -426,7 +426,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="topbar">
     <div><div class="page-title">Dükanlar</div><div class="page-sub">Ähli dükanlaryň sanawy</div></div>
     <div class="topbar-actions">
-      <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-store')">
+      <button class="btn btn-primary btn-sm" onclick="openAddStoreModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Dükan goş
       </button>
     </div>
@@ -804,8 +804,9 @@ function netProfitMonth(month){ const delivs=DB.deliveries.filter(d=>d.date.star
 
 // ─── Store calcs ───
 function storeDebt(id){
-  const sold=DB.deliveries.filter(d=>d.storeId===id).reduce((s,d)=>s+d.qty*d.price,0);
-  const paidImm=DB.deliveries.filter(d=>d.storeId===id).reduce((s,d)=>s+d.paidNow,0);
+  const dels=DB.deliveries.filter(d=>d.storeId===id);
+  const sold=dels.reduce((s,d)=>s+d.qty*d.price,0);
+  const paidImm=dels.reduce((s,d)=>s+d.paidNow,0);
   const paidLater=DB.payments.filter(p=>p.storeId===id).reduce((s,p)=>s+p.amount,0);
   return Math.max(0,sold-paidImm-paidLater);
 }
@@ -869,9 +870,18 @@ function openAddPurchaseModal(){
   openModal('modal-add-purchase');
 }
 
+function openAddStoreModal(){
+  ['ns-name','ns-contact','ns-phone','ns-addr'].forEach(id=>document.getElementById(id).value='');
+  openModal('modal-add-store');
+}
+
 function openAddDeliveryModal(){
   document.getElementById('del-date').value=today();
-  ['del-qty','del-price','del-total','del-paid-now'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('del-qty').value='';
+  document.getElementById('del-total').value='';
+  document.getElementById('del-paid-now').value='';
+  const lastPrice=currentStoreId?getDeliveryPrice(currentStoreId):0;
+  document.getElementById('del-price').value=lastPrice>0?lastPrice:'';
   setPayType('cash');
   openModal('modal-add-delivery');
 }
@@ -944,7 +954,7 @@ function saveBottleBatch(){
   dbInsert('bottleBatches',rec);
   const btlExpRec={id:uid(),date,amount:qty*(bottlePrice+labelPrice),categoryId:'cat_btl',note:'Baklažka gelip gowuşmasy'+(document.getElementById('btl-supplier').value.trim()?' · '+document.getElementById('btl-supplier').value.trim():''),sourceId:rec.id};
   DB.expenses.push(btlExpRec); dbInsert('expenses',btlExpRec);
-  closeModal('modal-add-bottle');renderBottlesPage();toast('Baklažka gelip gowuşmasy goşuldy');
+  closeModal('modal-add-bottle');renderBottlesPage();renderDashboard();toast('Baklažka gelip gowuşmasy goşuldy');
 }
 
 function savePurchase(){
@@ -957,7 +967,7 @@ function savePurchase(){
   dbInsert('purchases',rec);
   const expRec={id:uid(),date,amount:qty*cost,categoryId:'cat_chal',note:'Çal satyn alyş'+(rec.supplier?' · '+rec.supplier:''),sourceId:rec.id};
   DB.expenses.push(expRec); dbInsert('expenses',expRec);
-  closeModal('modal-add-purchase');renderPurchasesPage();toast('Satyn alyş goşuldy');
+  closeModal('modal-add-purchase');renderPurchasesPage();renderDashboard();toast('Satyn alyş goşuldy');
 }
 
 function saveDelivery(){
@@ -983,6 +993,7 @@ function savePayment(){
   if(!currentStoreId)return;
   const amount=parseFloat(document.getElementById('pay-amount').value);
   const date=document.getElementById('pay-date').value;
+  if(!date){toast('Senäni saýlaň','error');return;}
   if(!amount||amount<=0){toast('Mukdar giriziň','error');return;}
   const debt=storeDebt(currentStoreId);
   if(amount>debt+0.01){toast(`Mukdar bergiden köp (${fmt(debt)})`,'error');return;}
@@ -1004,7 +1015,7 @@ function saveReturn(){
 }
 
 function deleteBottleBatch(id){if(!confirm('Pozmaly?'))return;DB.bottleBatches=DB.bottleBatches.filter(b=>b.id!==id);dbDelete('bottleBatches',id);_deleteLinkedExpenses(id);renderBottlesPage();}
-function deleteDelivery(id){if(!confirm('Ibermäni pozmaly?'))return;DB.deliveries=DB.deliveries.filter(d=>d.id!==id);dbDelete('deliveries',id);renderStorePage(currentStoreId);renderStoresNav();}
+function deleteDelivery(id){if(!confirm('Ibermäni pozmaly?'))return;DB.deliveries=DB.deliveries.filter(d=>d.id!==id);dbDelete('deliveries',id);renderStorePage(currentStoreId);renderStoresNav();renderDashboard();}
 function deleteStore(id){
   if(!confirm('Dükany we ähli maglumatlary pozmaly?'))return;
   const delIds=DB.deliveries.filter(d=>d.storeId===id).map(d=>d.id);
@@ -1021,8 +1032,8 @@ function deleteStore(id){
   renderStoresNav();showPage('stores');
 }
 function deletePurchase(id){if(!confirm('Pozmaly?'))return;DB.purchases=DB.purchases.filter(p=>p.id!==id);dbDelete('purchases',id);_deleteLinkedExpenses(id);renderPurchasesPage();}
-function deletePayment(id){if(!confirm('Pozmaly?'))return;DB.payments=DB.payments.filter(p=>p.id!==id);dbDelete('payments',id);renderStorePage(currentStoreId);renderStoresNav();}
-function deleteReturn(id){if(!confirm('Pozmaly?'))return;DB.returns=DB.returns.filter(r=>r.id!==id);dbDelete('returns',id);renderStorePage(currentStoreId);}
+function deletePayment(id){if(!confirm('Pozmaly?'))return;DB.payments=DB.payments.filter(p=>p.id!==id);dbDelete('payments',id);renderStorePage(currentStoreId);renderStoresNav();renderDashboard();}
+function deleteReturn(id){if(!confirm('Pozmaly?'))return;DB.returns=DB.returns.filter(r=>r.id!==id);dbDelete('returns',id);renderStorePage(currentStoreId);renderDashboard();}
 
 // ═══════════════ NAVIGATION ═══════════════
 function showPage(name, storeId){
@@ -1133,18 +1144,21 @@ function renderDashboard(){
   const totalRevenue=DB.deliveries.reduce((s,d)=>s+d.qty*d.price,0);
   const totalCost=DB.purchases.reduce((s,p)=>s+p.qty*p.cost,0);
   const totalPaid=DB.deliveries.reduce((s,d)=>s+d.paidNow,0)+DB.payments.reduce((s,p)=>s+p.amount,0);
-  const totalDebt=DB.stores.reduce((s,st)=>s+storeDebt(st.id),0);
   const totalReturns=DB.returns.reduce((s,r)=>s+r.qty,0);
   const totalDelivered=DB.deliveries.reduce((s,d)=>s+d.qty,0);
   const totalBought=DB.purchases.reduce((s,p)=>s+p.qty,0);
   const bottleLeft=bottleStockLeft();
   const totalExpenses=DB.expenses.reduce((s,e)=>s+e.amount,0);
   const netProfit=totalPaid-totalExpenses;
+  // compute each store's debt once, reuse everywhere in this render
+  const debtCache=Object.fromEntries(DB.stores.map(s=>[s.id,storeDebt(s.id)]));
+  const totalDebt=Object.values(debtCache).reduce((s,d)=>s+d,0);
+  const debtCount=Object.values(debtCache).filter(d=>d>0).length;
 
   document.getElementById('dash-metrics').innerHTML=`
     <div class="metric-card"><div class="metric-label">Umumy girdeji</div><div class="metric-val blue">${fmt(totalRevenue)}</div><div class="metric-sub">Ähli ibermelerde</div></div>
     <div class="metric-card"><div class="metric-label">Alnan pul</div><div class="metric-val green">${fmt(totalPaid)}</div><div class="metric-sub">Nagt + tölegler</div></div>
-    <div class="metric-card"><div class="metric-label">Umumy bergi</div><div class="metric-val red">${fmt(totalDebt)}</div><div class="metric-sub">${DB.stores.filter(s=>storeDebt(s.id)>0).length} dükan</div></div>
+    <div class="metric-card"><div class="metric-label">Umumy bergi</div><div class="metric-val red">${fmt(totalDebt)}</div><div class="metric-sub">${debtCount} dükan</div></div>
     <div class="metric-card" style="cursor:pointer;" onclick="showPage('expenses')"><div class="metric-label">Jemi çykdajy</div><div class="metric-val red">${fmt(totalExpenses)}</div><div class="metric-sub">Çal + baklažka + aýlyk + beýleki</div></div>
     <div class="metric-card"><div class="metric-label">Arassa peýda</div><div class="metric-val ${netProfit>=0?'green':'red'}">${fmt(netProfit)}</div><div class="metric-sub">Alnan − ähli çykdajylar</div></div>
     <div class="metric-card"><div class="metric-label">Çal ammary</div><div class="metric-val">${fmtN(totalBought-totalDelivered)}</div><div class="metric-sub">çüýşe galdy</div></div>
@@ -1153,10 +1167,10 @@ function renderDashboard(){
   `;
 
   const debtsEl=document.getElementById('dash-debts-list');
-  const withDebt=DB.stores.filter(s=>storeDebt(s.id)>0).sort((a,b)=>storeDebt(b.id)-storeDebt(a.id));
+  const withDebt=DB.stores.filter(s=>debtCache[s.id]>0).sort((a,b)=>debtCache[b.id]-debtCache[a.id]);
   if(!withDebt.length){debtsEl.innerHTML=`<div class="empty"><div class="empty-icon">${IC.check}</div><div class="empty-title">Bergi ýok</div></div>`;}
   else debtsEl.innerHTML=withDebt.map(s=>{
-    const debt=storeDebt(s.id),sold=DB.deliveries.filter(d=>d.storeId===s.id).reduce((x,d)=>x+d.qty*d.price,0);
+    const debt=debtCache[s.id],sold=DB.deliveries.filter(d=>d.storeId===s.id).reduce((x,d)=>x+d.qty*d.price,0);
     const pct=sold>0?Math.min(100,(sold-debt)/sold*100):0;
     const clr=pct<50?'var(--red)':pct<80?'var(--amber)':'var(--green)';
     return`<div onclick="showPage('store','${s.id}')" style="cursor:pointer;padding:11px 0;border-bottom:1px solid var(--border);">
