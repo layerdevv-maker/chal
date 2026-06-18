@@ -14,7 +14,8 @@ const TABLE_MAP = {
   salaryPayments: 'salary_payments',
   settings:          'settings',
   expenses:          'expenses',
-  expenseCategories: 'expense_categories'
+  expenseCategories: 'expense_categories',
+  personalDebts:     'personal_debts'
 };
 
 const COLS = {
@@ -22,12 +23,13 @@ const COLS = {
   purchases:      ['id','date','qty','cost','supplier'],
   deliveries:     ['id','storeId','date','qty','price','paidNow','payType'],
   payments:       ['id','storeId','date','amount','note'],
-  returns:        ['id','storeId','date','qty','price','reason'],
+  returns:        ['id','storeId','date','qty','price','costPrice','reason'],
   bottleBatches:  ['id','date','qty','bottlePrice','labelPrice','supplier','note'],
   salaryPayments: ['id','date','base','bonus','note'],
   settings:          ['key','value'],
   expenses:          ['id','date','amount','categoryId','note','sourceId'],
-  expenseCategories: ['id','name','color','isSystem']
+  expenseCategories: ['id','name','color','isSystem'],
+  personalDebts:     ['id','date','creditor','amount','note']
 };
 
 const SEED_STORES = [
@@ -111,7 +113,10 @@ function init(userDataPath) {
     );
     CREATE TABLE IF NOT EXISTS returns (
       id TEXT PRIMARY KEY, storeId TEXT, date TEXT,
-      qty REAL, price REAL, reason TEXT
+      qty REAL, price REAL, costPrice REAL DEFAULT 0, reason TEXT
+    );
+    CREATE TABLE IF NOT EXISTS personal_debts (
+      id TEXT PRIMARY KEY, date TEXT, creditor TEXT, amount REAL, note TEXT
     );
     CREATE TABLE IF NOT EXISTS bottle_batches (
       id TEXT PRIMARY KEY, date TEXT, qty REAL,
@@ -131,6 +136,7 @@ function init(userDataPath) {
       id TEXT PRIMARY KEY, name TEXT, color TEXT, isSystem INTEGER DEFAULT 0
     );
   `);
+  try { db.exec('ALTER TABLE returns ADD COLUMN costPrice REAL DEFAULT 0'); } catch(e) {}
   seedStores();
   seedSettings();
   seedExpenseCategories();
@@ -192,7 +198,8 @@ function loadAll() {
     salaryPayments:    getAll('salaryPayments'),
     settings:          getAll('settings'),
     expenses:          getAll('expenses'),
-    expenseCategories: getAll('expenseCategories')
+    expenseCategories: getAll('expenseCategories'),
+    personalDebts:     getAll('personalDebts')
   };
 }
 
