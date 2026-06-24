@@ -624,7 +624,7 @@ tbody tr:hover td{background:var(--bg3)}
 <!-- SUPPLIER PAYMENT -->
 <div class="modal-overlay" id="modal-supplier-payment">
   <div class="modal">
-    <div class="modal-title">Üpjünçä töleg
+    <div class="modal-title">Postawka töleg
       <button class="modal-close" onclick="closeModal('modal-supplier-payment')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div style="background:var(--red-bg);border:1px solid #f0c0c0;border-radius:var(--r);padding:14px 16px;margin-bottom:18px;">
@@ -1226,14 +1226,14 @@ function renderPurchasesPage(){
     <div class="metric-card"><div class="metric-label">Jemi özüne düşüş</div><div class="metric-val red">${fmt(total)}</div></div>
     <div class="metric-card"><div class="metric-label">Ortaça baha</div><div class="metric-val">${fmt(avgCost)}</div></div>
     <div class="metric-card" style="cursor:pointer;" onclick="openStockAdjustModal()"><div class="metric-label">Çal ammary</div><div class="metric-val green">${fmtN(chalStock())} sany</div><div class="metric-sub">düzet</div></div>
-    ${supplierDebtTotal>0?`<div class="metric-card" style="border-color:rgba(184,50,50,.2);background:var(--red-bg);"><div class="metric-label">Üpjünçä borç</div><div class="metric-val red">${fmt(supplierDebtTotal)}</div><div class="metric-sub">ödenmeli galdy</div></div>`:''}
+    ${supplierDebtTotal>0?`<div class="metric-card" style="border-color:rgba(184,50,50,.2);background:var(--red-bg);"><div class="metric-label">Postawka borç</div><div class="metric-val red">${fmt(supplierDebtTotal)}</div><div class="metric-sub">ödenmeli galdy</div></div>`:''}
   `;
   const purchasesWithDebt=DB.purchases.filter(p=>purchaseSupplierDebt(p)>0).sort((a,b)=>b.date.localeCompare(a.date));
   document.getElementById('purchases-supplier-debts').innerHTML=purchasesWithDebt.length?`
     <div class="card" style="border-color:rgba(184,50,50,.2);margin-bottom:18px;">
       <div class="card-title" style="color:var(--red);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
-        Üpjünçi borçlary (${purchasesWithDebt.length})
+        Postawka tölegler (${purchasesWithDebt.length})
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
         ${purchasesWithDebt.map(p=>{
