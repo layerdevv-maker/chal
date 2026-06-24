@@ -19,7 +19,7 @@
       ],
       "icon": "assets/icon.png"
     },
-    "files": ["electron/**/*", "src/**/*", "db/**/*"],
+    "files": ["index.html", "electron/**/*", "db/**/*"],
     "extraResources": []
   },
   "devDependencies": {

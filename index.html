@@ -1882,10 +1882,41 @@ function importData(e){
   e.target.value='';
 }
 
+// ═══════════════ SQLITE MIGRATION (Electron only) ═══════════════
+async function migrateFromSQLite(){
+  if(typeof window.db==='undefined') return; // not in Electron
+  if(localStorage.getItem('chal_v4')) return; // already migrated
+  try{
+    const sql=await window.db.loadAll();
+    if(!sql||!sql.stores||!sql.stores.length) return;
+    // map expense categories id→name
+    const catMap={};
+    (sql.expenseCategories||[]).forEach(c=>catMap[c.id]=c.name);
+    DB.stores        = sql.stores||[];
+    DB.purchases     = (sql.purchases||[]).map(p=>({...p,payType:'cash',paidNow:Number(p.qty)*Number(p.cost)}));
+    DB.deliveries    = (sql.deliveries||[]).map(d=>({...d,paidNow:Number(d.paidNow||0),payType:d.payType||'cash'}));
+    DB.payments      = sql.payments||[];
+    DB.returns       = (sql.returns||[]).map(r=>({...r,costPrice:Number(r.costPrice||0)}));
+    DB.bottleBatches = sql.bottleBatches||[];
+    DB.personalDebts = sql.personalDebts||[];
+    DB.expenses      = (sql.expenses||[]).map(e=>({
+      id:e.id, date:e.date, amount:Number(e.amount),
+      category: catMap[e.categoryId]||'Beýleki',
+      note:e.note||''
+    }));
+    DB.exchanges=[];DB.supplierPayments=[];DB.stockAdjustments=[];
+    save();
+    console.log('SQLite migration done:', DB.stores.length, 'stores');
+  }catch(err){console.error('Migration error:',err);}
+}
+
 // ═══════════════ INIT ═══════════════
-load();
-renderStoresNav();
-renderDashboard();
+(async()=>{
+  await migrateFromSQLite();
+  load();
+  renderStoresNav();
+  renderDashboard();
+})();
 </script>
 </body>
 </html>

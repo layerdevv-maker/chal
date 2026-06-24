@@ -17,7 +17,7 @@ function createWindow() {
     }
   });
 
-  win.loadFile(path.join(__dirname, '..', 'src', 'index.html'));
+  win.loadFile(path.join(__dirname, '..', 'index.html'));
 
   win.webContents.on('did-finish-load', () => {
     win.setTitle('Kaswa Jebel Caly — Hasap ulgamy');
