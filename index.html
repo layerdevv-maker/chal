@@ -121,7 +121,7 @@ tbody tr:hover td{background:var(--bg3)}
 .badge-paid{background:var(--green-bg);color:var(--green)}
 .badge-bottle{background:var(--teal-bg);color:var(--teal)}
 /* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(10,10,8,.5);z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(10,10,8,.5);z-index:1000;display:none;align-items:center;justify-content:center;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
 .modal-overlay.open{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
 .modal-title{font-size:17px;font-weight:700;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.3px}
@@ -264,6 +264,13 @@ tbody tr:hover td{background:var(--bg3)}
       <button class="btn btn-teal btn-sm" onclick="showPage('bottles')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6l1 4H8L9 3z"/><path d="M8 7v10a3 3 0 006 0V7"/></svg>Baklažkalar
       </button>
+      <button class="btn btn-ghost btn-sm" onclick="exportData()" title="Maglumat eksport et (JSON)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Eksport
+      </button>
+      <label class="btn btn-ghost btn-sm" style="cursor:pointer;" title="Maglumat import et (JSON)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Import
+        <input type="file" accept=".json" style="display:none;" onchange="importData(event)">
+      </label>
     </div>
   </div>
   <div class="page-body">
@@ -1823,6 +1830,36 @@ function saveStockAdjust(){
   save();closeModal('modal-stock-adjust');renderDashboard();
   if(document.getElementById('page-purchases').classList.contains('active'))renderPurchasesPage();
   toast('Ammar düzedildi');
+}
+
+// ═══════════════ EXPORT / IMPORT ═══════════════
+function exportData(){
+  const json=JSON.stringify(DB,null,2);
+  const blob=new Blob([json],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='chal-backup-'+today()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Eksport taýýar');
+}
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      const p=JSON.parse(ev.target.result);
+      if(!p.stores)throw new Error();
+      if(!confirm('Häzirki maglumatlar çalşyrylar. Dowam etmeli?'))return;
+      DB={stores:[],purchases:[],deliveries:[],payments:[],returns:[],bottleBatches:[],personalDebts:[],exchanges:[],supplierPayments:[],expenses:[],stockAdjustments:[],...p};
+      save();renderStoresNav();renderDashboard();
+      toast('Import başartdy — '+p.stores.length+' dükan');
+    }catch{toast('Faýl nädogry','error');}
+  };
+  reader.readAsText(file);
+  e.target.value='';
 }
 
 // ═══════════════ INIT ═══════════════
