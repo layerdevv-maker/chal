@@ -1852,10 +1852,30 @@ function importData(e){
     try{
       const p=JSON.parse(ev.target.result);
       if(!p.stores)throw new Error();
-      if(!confirm('Häzirki maglumatlar çalşyrylar. Dowam etmeli?'))return;
-      DB={stores:[],purchases:[],deliveries:[],payments:[],returns:[],bottleBatches:[],personalDebts:[],exchanges:[],supplierPayments:[],expenses:[],stockAdjustments:[],...p};
-      save();renderStoresNav();renderDashboard();
-      toast('Import başartdy — '+p.stores.length+' dükan');
+      const choice=confirm(
+        'Birleşdirmek (OK) ýa-da Çalyşmak (Ýatyr)?\n\n'+
+        '✅ OK — iki bazany birleşdirer (esasy saklanyp, täze ýazgylar goşular)\n'+
+        '❌ Ýatyr — häzirki maglumatlar doly çalşyrylar'
+      );
+      const COLS=['stores','purchases','deliveries','payments','returns','bottleBatches','personalDebts','exchanges','supplierPayments','expenses','stockAdjustments'];
+      if(choice){
+        // MERGE: add records with IDs not already in DB
+        let added=0;
+        COLS.forEach(col=>{
+          if(!Array.isArray(p[col]))return;
+          const existingIds=new Set((DB[col]||[]).map(r=>r.id));
+          const newItems=p[col].filter(r=>!existingIds.has(r.id));
+          DB[col]=[...(DB[col]||[]),...newItems];
+          added+=newItems.length;
+        });
+        save();renderStoresNav();renderDashboard();
+        toast('Birleşdirildi — '+added+' täze ýazgy goşuldy');
+      } else {
+        if(!confirm('Häzirki ähli maglumatlar ÝOK BOLAR. Dowam etmeli?'))return;
+        DB={stores:[],purchases:[],deliveries:[],payments:[],returns:[],bottleBatches:[],personalDebts:[],exchanges:[],supplierPayments:[],expenses:[],stockAdjustments:[],...p};
+        save();renderStoresNav();renderDashboard();
+        toast('Çalşyryldy — '+p.stores.length+' dükan');
+      }
     }catch{toast('Faýl nädogry','error');}
   };
   reader.readAsText(file);
