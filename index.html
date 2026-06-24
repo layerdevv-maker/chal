@@ -238,6 +238,9 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="nav-item" onclick="showPage('personal-debts')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><line x1="17" y1="11" x2="23" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/></svg>Şahsy bergiler
     </div>
+    <div class="nav-item" onclick="showPage('expenses')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Harajatlar
+    </div>
   </div>
   <div class="sb-section" style="border-top:1px solid var(--border);flex:1;display:flex;flex-direction:column;">
     <div class="sb-label">Dükanlар</div>
@@ -384,6 +387,19 @@ tbody tr:hover td{background:var(--bg3)}
     </div>
   </div>
   <div class="page-body" id="personal-debts-body"></div>
+</div>
+
+<!-- EXPENSES PAGE -->
+<div id="page-expenses" class="page">
+  <div class="topbar">
+    <div><div class="page-title">Harajatlar</div><div class="page-sub">Gündelik çykdajylar (kärendä, ulag, zähmet haky...)</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-primary btn-sm" onclick="openAddExpenseModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Harajat goş
+      </button>
+    </div>
+  </div>
+  <div class="page-body" id="expenses-body"></div>
 </div>
 
 </div><!-- /main -->
@@ -639,6 +655,54 @@ tbody tr:hover td{background:var(--bg3)}
   </div>
 </div>
 
+<!-- ADD EXPENSE -->
+<div class="modal-overlay" id="modal-add-expense">
+  <div class="modal">
+    <div class="modal-title">Harajat goş
+      <button class="modal-close" onclick="closeModal('modal-add-expense')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Sene</label><input class="form-input" type="date" id="exp-date"></div>
+      <div class="form-group"><label class="form-label">Kategoriýa</label>
+        <select class="form-input" id="exp-category">
+          <option value="Kärendä">Kärendä (аренда)</option>
+          <option value="Ulag">Ulag (транспорт)</option>
+          <option value="Zähmet haky">Zähmet haky (зарплата)</option>
+          <option value="Jaý">Jaý (коммуналка)</option>
+          <option value="Beýleki">Beýleki (прочее)</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Mukdar</label><input class="form-input" type="number" id="exp-amount" placeholder="0.00" step="0.01" min="0"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Bellik</label><input class="form-input" id="exp-note" placeholder="..."></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-expense')">Ýatyr</button>
+      <button class="btn btn-primary" onclick="saveExpense()">Goş</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK ADJUST -->
+<div class="modal-overlay" id="modal-stock-adjust">
+  <div class="modal">
+    <div class="modal-title">Ammary düzet
+      <button class="modal-close" onclick="closeModal('modal-stock-adjust')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--r);padding:12px 16px;margin-bottom:16px;font-size:13px;">
+      Häzirki ammar: <strong id="modal-stock-current" style="font-family:var(--mono);"></strong> çüýşe
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Sene</label><input class="form-input" type="date" id="sa-date"></div>
+      <div class="form-group"><label class="form-label">Mukdar (+ goş, − aýyr)</label><input class="form-input" type="number" id="sa-qty" placeholder="-10 ýa-da +20"></div>
+      <div class="form-group" style="grid-column:1/-1;"><label class="form-label">Sebäp</label><input class="form-input" id="sa-note" placeholder="Çakdanaşa, ýitgi..."></div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-stock-adjust')">Ýatyr</button>
+      <button class="btn btn-primary" onclick="saveStockAdjust()">Ýatda sakla</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">
   <svg id="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"></svg>
   <span id="toast-msg"></span>
@@ -651,7 +715,9 @@ let DB = {
   bottleBatches:[],
   personalDebts:[],
   exchanges:[],
-  supplierPayments:[]
+  supplierPayments:[],
+  expenses:[],
+  stockAdjustments:[]
 };
 let currentStoreId = null;
 let currentPayType = 'cash';
@@ -664,7 +730,7 @@ function save(){ localStorage.setItem('chal_v4', JSON.stringify(DB)); }
 function load(){
   try {
     const raw = localStorage.getItem('chal_v4') || localStorage.getItem('chal_v2_tk') || localStorage.getItem('chal_v2');
-    if(raw){ const p=JSON.parse(raw); DB={...DB,...p}; if(!DB.bottleBatches)DB.bottleBatches=[]; if(!DB.personalDebts)DB.personalDebts=[]; if(!DB.exchanges)DB.exchanges=[]; if(!DB.supplierPayments)DB.supplierPayments=[]; }
+    if(raw){ const p=JSON.parse(raw); DB={...DB,...p}; if(!DB.bottleBatches)DB.bottleBatches=[]; if(!DB.personalDebts)DB.personalDebts=[]; if(!DB.exchanges)DB.exchanges=[]; if(!DB.supplierPayments)DB.supplierPayments=[]; if(!DB.expenses)DB.expenses=[]; if(!DB.stockAdjustments)DB.stockAdjustments=[]; }
   } catch(e){}
 }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
@@ -680,6 +746,17 @@ function monthLabel(ym){ const[y,m]=ym.split('-'); return MTK[parseInt(m)-1]+' '
 function bottleStockIn(){ return DB.bottleBatches.reduce((s,b)=>s+b.qty,0); }
 function bottleStockUsed(){ return DB.deliveries.reduce((s,d)=>s+d.qty,0); }
 function bottleStockLeft(){ return Math.max(0, bottleStockIn()-bottleStockUsed()); }
+function chalStock(){
+  const bought=DB.purchases.reduce((s,p)=>s+p.qty,0);
+  const delivered=DB.deliveries.reduce((s,d)=>s+d.qty,0);
+  const exchangeOut=DB.exchanges.reduce((s,e)=>s+e.newQty,0);
+  const adj=DB.stockAdjustments.reduce((s,a)=>s+a.qty,0);
+  return bought-delivered-exchangeOut+adj;
+}
+function totalExpenses(month){
+  const list=month?DB.expenses.filter(e=>e.date.startsWith(month)):DB.expenses;
+  return list.reduce((s,e)=>s+e.amount,0);
+}
 function bottleTotalCost(){ return DB.bottleBatches.reduce((s,b)=>s+(b.qty*b.bottlePrice)+(b.qty*b.labelPrice),0); }
 function bottleAvgCostPerUnit(){
   const totalIn=bottleStockIn();
@@ -814,13 +891,13 @@ function savePurchase(){
   const date=document.getElementById('pur-date').value;
   const qty=parseInt(document.getElementById('pur-qty').value);
   const cost=parseFloat(document.getElementById('pur-cost').value);
-  if(!date||!qty||!cost){toast('Ähli ýerleri dolduryň','error');return;}
+  if(!date||!qty||isNaN(cost)||cost<0){toast('Ähli ýerleri dolduryň','error');return;}
   const total=qty*cost;
   let paidNow=0;
   if(currentPurchasePayType==='cash') paidNow=total;
   else if(currentPurchasePayType==='partial'){
     paidNow=parseFloat(document.getElementById('pur-paid-now').value)||0;
-    if(paidNow>=total){toast('Öňünden töleg umumy summadan köp bolup bilmez','error');return;}
+    if(paidNow>total){toast('Öňünden töleg umumy summadan köp bolup bilmez','error');return;}
   }
   DB.purchases.push({id:uid(),date,qty,cost,supplier:document.getElementById('pur-supplier').value.trim(),payType:currentPurchasePayType,paidNow});
   save();closeModal('modal-add-purchase');renderPurchasesPage();toast('Satyn alyş goşuldy');
@@ -877,7 +954,7 @@ function showPage(name, storeId){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.querySelectorAll('.store-nav').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const navIdx={dashboard:0,'stores-list':1,bottles:2,purchases:3,analytics:4,reports:5,'personal-debts':6};
+  const navIdx={dashboard:0,'stores-list':1,bottles:2,purchases:3,analytics:4,reports:5,'personal-debts':6,expenses:7};
   if(navIdx[name]!==undefined) document.querySelectorAll('.nav-item')[navIdx[name]].classList.add('active');
   if(name==='dashboard') renderDashboard();
   if(name==='stores-list') renderStoresPage();
@@ -886,6 +963,7 @@ function showPage(name, storeId){
   if(name==='analytics') renderAnalyticsPage();
   if(name==='reports') renderReportsPage();
   if(name==='personal-debts') renderPersonalDebtsPage();
+  if(name==='expenses') renderExpensesPage();
   if(name==='store'&&storeId){
     currentStoreId=storeId;
     document.getElementById('page-store').classList.add('active');
@@ -933,20 +1011,21 @@ function renderDashboard(){
   const totalPaid=DB.deliveries.reduce((s,d)=>s+d.paidNow,0)+DB.payments.reduce((s,p)=>s+p.amount,0);
   const totalDebt=DB.stores.reduce((s,st)=>s+storeDebt(st.id),0);
   const totalReturns=DB.returns.reduce((s,r)=>s+r.qty,0);
-  const totalDelivered=DB.deliveries.reduce((s,d)=>s+d.qty,0);
-  const totalBought=DB.purchases.reduce((s,p)=>s+p.qty,0);
   const bottleLeft=bottleStockLeft();
-  const profit=totalPaid-totalCost;
+  const chalLeft=chalStock();
+  const expTotal=totalExpenses();
+  const profit=totalPaid-totalCost-expTotal;
 
   document.getElementById('dash-metrics').innerHTML=`
     <div class="metric-card"><div class="metric-label">Umumy girdeji</div><div class="metric-val blue">${fmt(totalRevenue)}</div><div class="metric-sub">Ähli ibermelerde</div></div>
     <div class="metric-card"><div class="metric-label">Alnan pul</div><div class="metric-val green">${fmt(totalPaid)}</div><div class="metric-sub">Nagt + tölegler</div></div>
     <div class="metric-card"><div class="metric-label">Umumy bergi</div><div class="metric-val red">${fmt(totalDebt)}</div><div class="metric-sub">${DB.stores.filter(s=>storeDebt(s.id)>0).length} dükan</div></div>
-    <div class="metric-card"><div class="metric-label">Peýda (hakyky)</div><div class="metric-val ${profit>=0?'green':'red'}">${fmt(profit)}</div><div class="metric-sub">Alnan − özüne düşüş</div></div>
-    <div class="metric-card"><div class="metric-label">Çal ammary</div><div class="metric-val">${fmtN(totalBought-totalDelivered)}</div><div class="metric-sub">çüýşe galdy</div></div>
+    <div class="metric-card"><div class="metric-label">Peýda (hakyky)</div><div class="metric-val ${profit>=0?'green':'red'}">${fmt(profit)}</div><div class="metric-sub">Alnan − çykdajy − harajat</div></div>
+    <div class="metric-card" style="cursor:pointer;" onclick="openStockAdjustModal()"><div class="metric-label">Çal ammary</div><div class="metric-val">${fmtN(chalLeft)}</div><div class="metric-sub">çüýşe galdy · düzet</div></div>
     <div class="metric-card" style="cursor:pointer;" onclick="showPage('bottles')"><div class="metric-label">Baklažka</div><div class="metric-val teal">${fmtN(bottleLeft)}</div><div class="metric-sub">sany galdy</div></div>
     <div class="metric-card"><div class="metric-label">Gaýtarmalar</div><div class="metric-val amber">${fmtN(totalReturns)}</div><div class="metric-sub">çüýşe yzyna geldi</div></div>
     <div class="metric-card" style="cursor:pointer;border-color:rgba(184,50,50,.2);background:var(--red-bg);" onclick="showPage('personal-debts')"><div class="metric-label">Şahsy bergiler</div><div class="metric-val red">${fmt(totalPersonalDebt())}</div><div class="metric-sub">meniň bergilerim</div></div>
+    <div class="metric-card" style="cursor:pointer;border-color:rgba(184,50,50,.15);background:var(--red-bg);" onclick="showPage('expenses')"><div class="metric-label">Harajatlar (jemi)</div><div class="metric-val red">${fmt(expTotal)}</div><div class="metric-sub">${DB.expenses.length} ýazgy</div></div>
   `;
 
   const debtsEl=document.getElementById('dash-debts-list');
@@ -1117,14 +1196,13 @@ function saveSupplierPayment(){
 function renderPurchasesPage(){
   const total=DB.purchases.reduce((s,p)=>s+p.qty*p.cost,0);
   const totalQty=DB.purchases.reduce((s,p)=>s+p.qty,0);
-  const totalDelivered=DB.deliveries.reduce((s,d)=>s+d.qty,0);
   const avgCost=totalQty>0?total/totalQty:0;
   const supplierDebtTotal=totalSupplierDebt();
   document.getElementById('purchases-metrics').innerHTML=`
     <div class="metric-card"><div class="metric-label">Satyn alnan (çal)</div><div class="metric-val">${fmtN(totalQty)} sany</div></div>
     <div class="metric-card"><div class="metric-label">Jemi özüne düşüş</div><div class="metric-val red">${fmt(total)}</div></div>
     <div class="metric-card"><div class="metric-label">Ortaça baha</div><div class="metric-val">${fmt(avgCost)}</div></div>
-    <div class="metric-card"><div class="metric-label">Çal ammary</div><div class="metric-val green">${fmtN(totalQty-totalDelivered)} sany</div></div>
+    <div class="metric-card" style="cursor:pointer;" onclick="openStockAdjustModal()"><div class="metric-label">Çal ammary</div><div class="metric-val green">${fmtN(chalStock())} sany</div><div class="metric-sub">düzet</div></div>
     ${supplierDebtTotal>0?`<div class="metric-card" style="border-color:rgba(184,50,50,.2);background:var(--red-bg);"><div class="metric-label">Üpjünçä borç</div><div class="metric-val red">${fmt(supplierDebtTotal)}</div><div class="metric-sub">ödenmeli galdy</div></div>`:''}
   `;
   const purchasesWithDebt=DB.purchases.filter(p=>purchaseSupplierDebt(p)>0).sort((a,b)=>b.date.localeCompare(a.date));
@@ -1433,7 +1511,8 @@ function renderAnalyticsPage(){
   const paidLater=pays.reduce((s,p)=>s+p.amount,0);
   const totalPaid=paidImm+paidLater;
   const debt=Math.max(0,revenue-totalPaid-retVal);
-  const profit=totalPaid-cost;
+  const expMonth=totalExpenses(month);
+  const profit=totalPaid-cost-expMonth;
   const qty=delivs.reduce((s,d)=>s+d.qty,0);
   const btlQty=btls.reduce((s,b)=>s+b.qty,0);
   const btlCost=btls.reduce((s,b)=>s+b.qty*(b.bottlePrice+b.labelPrice),0);
@@ -1448,7 +1527,8 @@ function renderAnalyticsPage(){
       <div class="metric-card"><div class="metric-label">Alnan</div><div class="metric-val green">${fmt(totalPaid)}</div></div>
       <div class="metric-card"><div class="metric-label">Aýlyk bergi</div><div class="metric-val ${debt>0?'red':'green'}">${fmt(Math.max(0,debt))}</div></div>
       <div class="metric-card"><div class="metric-label">Özüne düşüş</div><div class="metric-val">${fmt(cost)}</div></div>
-      <div class="metric-card"><div class="metric-label">Peýda</div><div class="metric-val ${profit>=0?'green':'red'}">${fmt(profit)}</div></div>
+      ${expMonth>0?`<div class="metric-card" style="border-color:rgba(184,50,50,.2);background:var(--red-bg);cursor:pointer;" onclick="showPage('expenses')"><div class="metric-label">Harajatlar</div><div class="metric-val red">${fmt(expMonth)}</div></div>`:''}
+      <div class="metric-card"><div class="metric-label">Peýda</div><div class="metric-val ${profit>=0?'green':'red'}">${fmt(profit)}</div><div class="metric-sub">Alnan − çykdajy − harajat</div></div>
       <div class="metric-card"><div class="metric-label">Baklažka geldi</div><div class="metric-val teal">${fmtN(btlQty)} sany</div><div class="metric-sub">${fmt(btlCost)} çykdajy</div></div>
     </div>
     <div class="two-col">
@@ -1492,12 +1572,12 @@ function renderAnalyticsPage(){
 function renderReportsPage(){
   const body=document.getElementById('reports-body');
   const allMonths=new Set();
-  [...DB.deliveries,...DB.purchases,...DB.bottleBatches].forEach(x=>allMonths.add(x.date.slice(0,7)));
+  [...DB.deliveries,...DB.purchases,...DB.bottleBatches,...DB.expenses].forEach(x=>allMonths.add(x.date.slice(0,7)));
   const months=[...allMonths].sort().reverse();
   body.innerHTML=`
     <div class="card">
       <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Aýlyk jemleýji hasabat</div>
-      <div class="table-wrap"><table><thead><tr><th>Aý</th><th>Satyn (sany)</th><th>Özüne düşüş</th><th>Baklažka</th><th>Iberilen</th><th>Girdeji</th><th>Alnan</th><th>Bergi</th><th>Peýda</th></tr></thead><tbody>
+      <div class="table-wrap"><table><thead><tr><th>Aý</th><th>Satyn (sany)</th><th>Özüne düşüş</th><th>Harajat</th><th>Baklažka</th><th>Iberilen</th><th>Girdeji</th><th>Alnan</th><th>Bergi</th><th>Peýda</th></tr></thead><tbody>
         ${months.map(m=>{
           const delivs=DB.deliveries.filter(d=>d.date.startsWith(m));
           const purch=DB.purchases.filter(p=>p.date.startsWith(m));
@@ -1512,12 +1592,14 @@ function renderReportsPage(){
           const paidLater=pays.reduce((s,p)=>s+p.amount,0);
           const totalPaid=paidImm+paidLater;
           const debt=Math.max(0,rev-totalPaid-retVal);
-          const profit=totalPaid-cost;
+          const expM=totalExpenses(m);
+          const profit=totalPaid-cost-expM;
           const btlQty=btls.reduce((s,b)=>s+b.qty,0);
           return`<tr>
             <td style="font-weight:600;">${monthLabel(m)}</td>
             <td class="mono">${fmtN(purch.reduce((s,p)=>s+p.qty,0))}</td>
             <td class="mono">${fmt(cost)}</td>
+            <td class="mono" style="color:var(--red);">${expM>0?fmt(expM):'—'}</td>
             <td class="mono" style="color:var(--teal);">+${fmtN(btlQty)}</td>
             <td class="mono">${fmtN(delivs.reduce((s,d)=>s+d.qty,0))}</td>
             <td class="mono">${fmt(rev)}</td>
@@ -1613,6 +1695,76 @@ function renderPersonalDebtsPage(){
       </tbody></table></div>`:`<div class="empty"><div class="empty-title">Bergi ýok</div><div class="empty-sub">Täze bergi goşmak üçin ýokarky düwmä basyň</div></div>`}
     </div>
   `;
+}
+
+// ═══════════════ EXPENSES ═══════════════
+function openAddExpenseModal(){
+  document.getElementById('exp-date').value=today();
+  document.getElementById('exp-amount').value='';
+  document.getElementById('exp-note').value='';
+  openModal('modal-add-expense');
+}
+function saveExpense(){
+  const date=document.getElementById('exp-date').value;
+  const amount=parseFloat(document.getElementById('exp-amount').value);
+  const category=document.getElementById('exp-category').value;
+  if(!date||isNaN(amount)||amount<=0){toast('Ähli ýerleri dolduryň','error');return;}
+  DB.expenses.push({id:uid(),date,category,amount,note:document.getElementById('exp-note').value.trim()});
+  save();closeModal('modal-add-expense');renderExpensesPage();renderDashboard();toast('Harajat goşuldy');
+}
+function deleteExpense(id){
+  if(!confirm('Pozmaly?'))return;
+  DB.expenses=DB.expenses.filter(e=>e.id!==id);
+  save();renderExpensesPage();renderDashboard();
+}
+function renderExpensesPage(){
+  const list=[...DB.expenses].sort((a,b)=>b.date.localeCompare(a.date));
+  const total=totalExpenses();
+  const byCategory={};
+  list.forEach(e=>{byCategory[e.category]=(byCategory[e.category]||0)+e.amount;});
+  const body=document.getElementById('expenses-body');
+  body.innerHTML=`
+    <div class="metrics-grid">
+      <div class="metric-card" style="border-color:rgba(184,50,50,.2);background:var(--red-bg);">
+        <div class="metric-label">Jemi harajat</div>
+        <div class="metric-val red">${fmt(total)}</div>
+        <div class="metric-sub">${list.length} ýazgy</div>
+      </div>
+      ${Object.entries(byCategory).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+        <div class="metric-card"><div class="metric-label">${k}</div><div class="metric-val">${fmt(v)}</div></div>
+      `).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Harajatlar sanawy</div>
+      ${list.length?`<div class="table-wrap"><table><thead><tr><th>Sene</th><th>Kategoriýa</th><th>Mukdar</th><th>Bellik</th><th></th></tr></thead><tbody>
+        ${list.map(e=>`<tr>
+          <td class="mono" style="color:var(--text3);">${e.date}</td>
+          <td><span class="badge badge-credit">${e.category}</span></td>
+          <td class="mono" style="color:var(--red);font-weight:700;">${fmt(e.amount)}</td>
+          <td style="color:var(--text3);font-size:12px;">${e.note||'—'}</td>
+          <td><button class="btn btn-danger btn-xs" onclick="deleteExpense('${e.id}')">Poz</button></td>
+        </tr>`).join('')}
+      </tbody></table></div>`:`<div class="empty"><div class="empty-title">Harajat ýok</div><div class="empty-sub">Täze harajat goşmak üçin ýokarky düwmä basyň</div></div>`}
+    </div>
+  `;
+}
+
+// ═══════════════ STOCK ADJUSTMENTS ═══════════════
+function openStockAdjustModal(){
+  document.getElementById('sa-date').value=today();
+  document.getElementById('sa-qty').value='';
+  document.getElementById('sa-note').value='';
+  document.getElementById('modal-stock-current').textContent=fmtN(chalStock());
+  openModal('modal-stock-adjust');
+}
+function saveStockAdjust(){
+  const date=document.getElementById('sa-date').value;
+  const qty=parseInt(document.getElementById('sa-qty').value);
+  if(!date||isNaN(qty)||qty===0){toast('Mukdary giriziň','error');return;}
+  DB.stockAdjustments.push({id:uid(),date,qty,note:document.getElementById('sa-note').value.trim()});
+  save();closeModal('modal-stock-adjust');renderDashboard();
+  if(document.getElementById('page-purchases').classList.contains('active'))renderPurchasesPage();
+  toast('Ammar düzedildi');
 }
 
 // ═══════════════ INIT ═══════════════
