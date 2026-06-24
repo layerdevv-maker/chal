@@ -1211,6 +1211,11 @@ function saveSupplierPayment(){
   DB.supplierPayments.push({id:uid(),purchaseId:currentSupplierPurchaseId,date,amount,note:document.getElementById('sp-note').value.trim()});
   save();closeModal('modal-supplier-payment');renderPurchasesPage();toast('Töleg ýazyldy');
 }
+function deleteSupplierPayment(id){
+  if(!confirm('Pozmaly?'))return;
+  DB.supplierPayments=DB.supplierPayments.filter(p=>p.id!==id);
+  save();renderPurchasesPage();
+}
 function renderPurchasesPage(){
   const total=DB.purchases.reduce((s,p)=>s+p.qty*p.cost,0);
   const totalQty=DB.purchases.reduce((s,p)=>s+p.qty,0);
@@ -1230,21 +1235,47 @@ function renderPurchasesPage(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
         Üpjünçi borçlary (${purchasesWithDebt.length})
       </div>
-      <div class="table-wrap"><table>
-        <thead><tr><th>Sene</th><th>Üpjünçi</th><th>Mukdar</th><th>Jemi</th><th>Tölendi</th><th>Galyndy borç</th><th></th></tr></thead>
-        <tbody>${purchasesWithDebt.map(p=>{
-          const t2=p.qty*p.cost,d2=purchaseSupplierDebt(p),paid2=t2-d2;
-          return`<tr>
-            <td class="mono" style="color:var(--text3);">${p.date}</td>
-            <td>${p.supplier||'—'}</td>
-            <td class="mono">${fmtN(p.qty)} sany</td>
-            <td class="mono" style="font-weight:700;">${fmt(t2)}</td>
-            <td class="mono" style="color:var(--green);">${fmt(paid2)}</td>
-            <td class="mono" style="color:var(--red);font-weight:700;">${fmt(d2)}</td>
-            <td><button class="btn btn-success btn-xs" onclick="openSupplierPaymentModal('${p.id}')">Töleg et</button></td>
-          </tr>`;
-        }).join('')}</tbody>
-      </table></div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        ${purchasesWithDebt.map(p=>{
+          const total=p.qty*p.cost, debt=purchaseSupplierDebt(p), paid=total-debt;
+          const pct=total>0?Math.round(paid/total*100):0;
+          const daysSince=Math.floor((Date.now()-new Date(p.date).getTime())/86400000);
+          const pmts=DB.supplierPayments.filter(sp=>sp.purchaseId===p.id).sort((a,b)=>b.date.localeCompare(a.date));
+          const [y,m,d]=p.date.split('-');
+          return`<div style="border:1px solid rgba(184,50,50,.25);border-radius:var(--r2);padding:16px 18px;background:var(--red-bg);">
+            <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:12px;">
+              <div style="text-align:center;background:rgba(184,50,50,.12);border-radius:var(--r);padding:8px 14px;min-width:52px;flex-shrink:0;">
+                <div style="font-size:22px;font-weight:800;font-family:var(--mono);color:var(--red);line-height:1;">${d}</div>
+                <div style="font-size:11px;color:var(--red);opacity:.7;margin-top:2px;">${['Ýan','Few','Mar','Apr','Maý','Iýun','Iýul','Awg','Sen','Okt','Noý','Dek'][parseInt(m)-1]}</div>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:14px;font-weight:700;margin-bottom:3px;">${p.supplier||'Üpjünçi'} · ${fmtN(p.qty)} sany × ${fmt(p.cost)}</div>
+                <div style="font-size:12px;color:var(--text3);">${daysSince} gün öň · ${payTypeBadge(p.payType||'cash')}</div>
+                <div style="margin-top:8px;">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;">
+                    <span>Tölendi: <strong style="color:var(--green);">${fmt(paid)}</strong></span>
+                    <span>Galyndy: <strong style="color:var(--red);">${fmt(debt)}</strong></span>
+                    <span>${pct}%</span>
+                  </div>
+                  <div style="height:5px;background:var(--border);border-radius:99px;overflow:hidden;">
+                    <div style="height:100%;width:${pct}%;background:var(--green);border-radius:99px;"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="btn btn-success btn-sm" style="flex-shrink:0;" onclick="openSupplierPaymentModal('${p.id}')">Töleg et</button>
+            </div>
+            ${pmts.length?`<div style="border-top:1px solid rgba(184,50,50,.2);padding-top:10px;display:flex;flex-direction:column;gap:6px;">
+              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;">Töleg taryhy</div>
+              ${pmts.map(sp=>`<div style="display:flex;align-items:center;gap:10px;font-size:13px;">
+                <span class="mono" style="color:var(--text3);font-size:12px;min-width:90px;">${sp.date}</span>
+                <span style="color:var(--green);font-weight:600;font-family:var(--mono);">+${fmt(sp.amount)}</span>
+                ${sp.note?`<span style="color:var(--text3);font-size:12px;">· ${sp.note}</span>`:''}
+                <button class="btn btn-danger btn-xs" style="margin-left:auto;" onclick="deleteSupplierPayment('${sp.id}')">Poz</button>
+              </div>`).join('')}
+            </div>`:''}
+          </div>`;
+        }).join('')}
+      </div>
     </div>
   `:'';
   const tbl=document.getElementById('purchases-table');
@@ -1260,7 +1291,10 @@ function renderPurchasesPage(){
         <td class="mono" style="font-weight:700;color:var(--accent);">${fmt(p.qty*p.cost)}</td>
         <td>${payTypeBadge(p.payType||'cash')}</td>
         <td class="mono" style="color:${d2>0?'var(--red)':'var(--text3)'};">${d2>0?fmt(d2):'—'}</td>
-        <td><button class="btn btn-danger btn-xs" onclick="deletePurchase('${p.id}')">Poz</button></td>
+        <td style="display:flex;gap:4px;">
+          ${d2>0?`<button class="btn btn-success btn-xs" onclick="openSupplierPaymentModal('${p.id}')">Töleg</button>`:''}
+          <button class="btn btn-danger btn-xs" onclick="deletePurchase('${p.id}')">Poz</button>
+        </td>
       </tr>`;
     }).join('')+'</tbody></table>';
 }
