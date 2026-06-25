@@ -1,7 +1,15 @@
 'use strict';
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
-const db = require('../db/database');
+
+// SQLite only needed for one-time migration of old data.
+// If better-sqlite3 fails (wrong arch, missing native module), app still works via localStorage.
+let db = null;
+try {
+  db = require('../db/database');
+} catch(e) {
+  console.log('SQLite not available, skipping migration:', e.message);
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -25,7 +33,9 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  db.init(app.getPath('userData'));
+  if (db) {
+    try { db.init(app.getPath('userData')); } catch(e) { console.log('DB init failed:', e.message); db = null; }
+  }
   createWindow();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -36,6 +46,6 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.handle('db:loadAll', () => db.loadAll());
-ipcMain.handle('db:insert', (_, table, data) => db.insert(table, data));
-ipcMain.handle('db:delete', (_, table, id) => db.deleteRecord(table, id));
+ipcMain.handle('db:loadAll', () => db ? db.loadAll() : null);
+ipcMain.handle('db:insert', (_, table, data) => db ? db.insert(table, data) : null);
+ipcMain.handle('db:delete', (_, table, id) => db ? db.deleteRecord(table, id) : null);
