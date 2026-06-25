@@ -24,17 +24,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Rebuild better-sqlite3 for arm64
-        run: npx electron-rebuild -f -w better-sqlite3 --arch arm64
+      - name: Rebuild better-sqlite3
+        run: npx electron-rebuild -f -w better-sqlite3
 
       - name: Build DMG (arm64)
-        run: npx electron-builder --mac --arch arm64 --publish never
-
-      - name: Rebuild better-sqlite3 for x64
-        run: npx electron-rebuild -f -w better-sqlite3 --arch x64
+        run: npx electron-builder --mac --arm64 --publish never
 
       - name: Build DMG (x64)
-        run: npx electron-builder --mac --arch x64 --publish never
+        run: npx electron-builder --mac --x64 --publish never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
