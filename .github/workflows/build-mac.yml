@@ -27,34 +27,42 @@ jobs:
       - name: Rebuild better-sqlite3
         run: npx electron-rebuild -f -w better-sqlite3
 
-      # ── arm64 ──────────────────────────────────────────
-      - name: Build app (arm64)
+      # ── arm64 (M1/M2/M3) ───────────────────────────────
+      - name: Build app dir (arm64)
         run: npx electron-builder --mac --arm64 --dir --publish never
 
-      - name: Find and sign arm64
+      - name: Sign + package DMG (arm64)
         run: |
           APP=$(find dist -name "*.app" -maxdepth 3 | head -1)
-          echo "Found app: $APP"
+          echo "App: $APP"
           codesign --deep --force --sign - "$APP"
-          hdiutil create -volname "Kaswa Jebel Caly" \
-            -srcfolder "$APP" \
+          mkdir -p /tmp/dmg-arm64
+          cp -R "$APP" /tmp/dmg-arm64/
+          ln -s /Applications /tmp/dmg-arm64/Applications
+          hdiutil create \
+            -volname "Kaswa Jebel Caly" \
+            -srcfolder /tmp/dmg-arm64 \
             -ov -format UDZO \
             "dist/Kaswa-Jebel-Caly-arm64.dmg"
 
       - name: Clean dist apps
         run: rm -rf dist/mac*
 
-      # ── x64 ────────────────────────────────────────────
-      - name: Build app (x64)
+      # ── x64 (Intel) ────────────────────────────────────
+      - name: Build app dir (x64)
         run: npx electron-builder --mac --x64 --dir --publish never
 
-      - name: Find and sign x64
+      - name: Sign + package DMG (x64)
         run: |
           APP=$(find dist -name "*.app" -maxdepth 3 | head -1)
-          echo "Found app: $APP"
+          echo "App: $APP"
           codesign --deep --force --sign - "$APP"
-          hdiutil create -volname "Kaswa Jebel Caly" \
-            -srcfolder "$APP" \
+          mkdir -p /tmp/dmg-x64
+          cp -R "$APP" /tmp/dmg-x64/
+          ln -s /Applications /tmp/dmg-x64/Applications
+          hdiutil create \
+            -volname "Kaswa Jebel Caly" \
+            -srcfolder /tmp/dmg-x64 \
             -ov -format UDZO \
             "dist/Kaswa-Jebel-Caly-x64.dmg"
 
