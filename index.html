@@ -1231,12 +1231,29 @@ function renderPurchasesPage(){
   const totalQty=DB.purchases.reduce((s,p)=>s+p.qty,0);
   const avgCost=totalQty>0?total/totalQty:0;
   const supplierDebtTotal=totalSupplierDebt();
+  const totalPaidToSuppliers=DB.purchases.reduce((s,p)=>s+p.paidNow,0)+DB.supplierPayments.reduce((s,sp)=>s+sp.amount,0);
+  const creditPurchases=DB.purchases.filter(p=>(p.payType||'cash')!=='cash');
+  const cashPurchases=DB.purchases.filter(p=>(p.payType||'cash')==='cash');
+  const suppliers=[...new Set(DB.purchases.map(p=>p.supplier).filter(Boolean))];
+  const lastPurchase=[...DB.purchases].sort((a,b)=>b.date.localeCompare(a.date))[0];
+
   document.getElementById('purchases-metrics').innerHTML=`
-    <div class="metric-card"><div class="metric-label">Satyn alnan (çal)</div><div class="metric-val">${fmtN(totalQty)} sany</div></div>
-    <div class="metric-card"><div class="metric-label">Jemi özüne düşüş</div><div class="metric-val red">${fmt(total)}</div></div>
-    <div class="metric-card"><div class="metric-label">Ortaça baha</div><div class="metric-val">${fmt(avgCost)}</div></div>
-    <div class="metric-card" style="cursor:pointer;" onclick="openStockAdjustModal()"><div class="metric-label">Çal ammary</div><div class="metric-val green">${fmtN(chalStock())} sany</div><div class="metric-sub">düzet</div></div>
-    ${supplierDebtTotal>0?`<div class="metric-card" style="border-color:rgba(184,50,50,.2);background:var(--red-bg);"><div class="metric-label">Postawka borç</div><div class="metric-val red">${fmt(supplierDebtTotal)}</div><div class="metric-sub">ödenmeli galdy</div></div>`:''}
+    <div class="card" style="margin-bottom:18px;">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+        Umumy statistika
+      </div>
+      <div class="metrics-grid" style="margin-bottom:0;">
+        <div class="metric-card"><div class="metric-label">Satyn alnan (jemi)</div><div class="metric-val">${fmtN(totalQty)} sany</div><div class="metric-sub">${DB.purchases.length} gezek satyn alyndy</div></div>
+        <div class="metric-card"><div class="metric-label">Jemi bahasy</div><div class="metric-val">${fmt(total)}</div><div class="metric-sub">Ortaça: ${fmt(avgCost)}/sany</div></div>
+        <div class="metric-card"><div class="metric-label">Tölendi (üpjünçä)</div><div class="metric-val green">${fmt(totalPaidToSuppliers)}</div><div class="metric-sub">Nagt + geçen tölegler</div></div>
+        <div class="metric-card" style="${supplierDebtTotal>0?'border-color:rgba(184,50,50,.2);background:var(--red-bg);':''}"><div class="metric-label">Galyndy borç</div><div class="metric-val ${supplierDebtTotal>0?'red':'green'}">${fmt(supplierDebtTotal)}</div><div class="metric-sub">${creditPurchases.length} karzly satyn alyş</div></div>
+        <div class="metric-card" style="cursor:pointer;" onclick="openStockAdjustModal()"><div class="metric-label">Çal ammary</div><div class="metric-val">${fmtN(chalStock())} sany</div><div class="metric-sub">häzir bar · düzet</div></div>
+        <div class="metric-card"><div class="metric-label">Nagt satyn alyş</div><div class="metric-val teal">${cashPurchases.length}</div><div class="metric-sub">${fmt(cashPurchases.reduce((s,p)=>s+p.qty*p.cost,0))}</div></div>
+        <div class="metric-card"><div class="metric-label">Üpjünçiler</div><div class="metric-val">${suppliers.length}</div><div class="metric-sub">${suppliers.slice(0,2).join(', ')+(suppliers.length>2?' ...':'')}</div></div>
+        <div class="metric-card"><div class="metric-label">Soňky satyn alyş</div><div class="metric-val" style="font-size:16px;">${lastPurchase?lastPurchase.date:'—'}</div><div class="metric-sub">${lastPurchase?fmtN(lastPurchase.qty)+' sany · '+fmt(lastPurchase.cost)+'/sany':''}</div></div>
+      </div>
+    </div>
   `;
   const purchasesWithDebt=DB.purchases.filter(p=>purchaseSupplierDebt(p)>0).sort((a,b)=>b.date.localeCompare(a.date));
   document.getElementById('purchases-supplier-debts').innerHTML=purchasesWithDebt.length?`
