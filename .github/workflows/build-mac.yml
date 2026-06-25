@@ -31,27 +31,30 @@ jobs:
       - name: Build app (arm64)
         run: npx electron-builder --mac --arm64 --dir --publish never
 
-      - name: Sign arm64 (ad-hoc)
-        run: codesign --deep --force --sign - "dist/mac-arm64/Kaswa Jebel Caly.app"
-
-      - name: Package arm64 DMG
+      - name: Find and sign arm64
         run: |
+          APP=$(find dist -name "*.app" -maxdepth 3 | head -1)
+          echo "Found app: $APP"
+          codesign --deep --force --sign - "$APP"
           hdiutil create -volname "Kaswa Jebel Caly" \
-            -srcfolder "dist/mac-arm64/Kaswa Jebel Caly.app" \
+            -srcfolder "$APP" \
             -ov -format UDZO \
             "dist/Kaswa-Jebel-Caly-arm64.dmg"
+
+      - name: Clean dist apps
+        run: rm -rf dist/mac*
 
       # ── x64 ────────────────────────────────────────────
       - name: Build app (x64)
         run: npx electron-builder --mac --x64 --dir --publish never
 
-      - name: Sign x64 (ad-hoc)
-        run: codesign --deep --force --sign - "dist/mac-x64/Kaswa Jebel Caly.app"
-
-      - name: Package x64 DMG
+      - name: Find and sign x64
         run: |
+          APP=$(find dist -name "*.app" -maxdepth 3 | head -1)
+          echo "Found app: $APP"
+          codesign --deep --force --sign - "$APP"
           hdiutil create -volname "Kaswa Jebel Caly" \
-            -srcfolder "dist/mac-x64/Kaswa Jebel Caly.app" \
+            -srcfolder "$APP" \
             -ov -format UDZO \
             "dist/Kaswa-Jebel-Caly-x64.dmg"
 
