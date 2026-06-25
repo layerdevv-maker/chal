@@ -246,7 +246,7 @@ tbody tr:hover td{background:var(--bg3)}
     <div class="sb-label">Dükanlар</div>
     <div class="sb-stores" id="stores-nav"></div>
     <div style="padding:0 10px 16px;">
-      <button class="add-store-btn" onclick="openModal('modal-add-store')">
+      <button class="add-store-btn" onclick="openAddStoreModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Dükan goş
       </button>
     </div>
@@ -297,7 +297,7 @@ tbody tr:hover td{background:var(--bg3)}
   <div class="topbar">
     <div><div class="page-title">Dükanlar</div><div class="page-sub">Ähli dükanlaryň sanawy we deňeşdirmesi</div></div>
     <div class="topbar-actions">
-      <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-store')">
+      <button class="btn btn-primary btn-sm" onclick="openAddStoreModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Dükan goş
       </button>
     </div>
@@ -843,8 +843,8 @@ function openPaymentModal(){
 function updateRetStockPreview(){
   const cur=chalStock();
   const give=parseInt(document.getElementById('ret-qty').value)||0;
-  document.getElementById('ret-stock-display').textContent=fmtN(cur+give); // до записи
-  document.getElementById('ret-stock-after').textContent=fmtN(cur);        // после замены
+  document.getElementById('ret-stock-display').textContent=fmtN(cur);
+  document.getElementById('ret-stock-after').textContent=fmtN(cur-give);
 }
 function openReturnModal(){
   document.getElementById('ret-date').value=today();
@@ -895,6 +895,10 @@ function updateBottleTotal(){
 }));
 
 // ═══════════════ SAVE ACTIONS ═══════════════
+function openAddStoreModal(){
+  ['ns-name','ns-contact','ns-phone','ns-addr'].forEach(id=>document.getElementById(id).value='');
+  openModal('modal-add-store');
+}
 function saveNewStore(){
   const name=document.getElementById('ns-name').value.trim();
   if(!name){toast('Dükan adyny ýazyň','error');return;}
@@ -940,7 +944,7 @@ function saveDelivery(){
   if(currentPayType==='cash') paidNow=total;
   else if(currentPayType==='partial'){
     paidNow=parseFloat(document.getElementById('del-paid-now').value)||0;
-    if(paidNow>=total){toast('Öňünden töleg umumy summadan köp bolup bilmez','error');return;}
+    if(paidNow>total){toast('Öňünden töleg umumy summadan köp bolup bilmez','error');return;}
   }
   DB.deliveries.push({id:uid(),storeId:currentStoreId,date,qty,price,paidNow,payType:currentPayType});
   save();closeModal('modal-add-delivery');renderStorePage(currentStoreId);renderStoresNav();toast('Iberme ýazyldy');
@@ -968,11 +972,11 @@ function saveReturn(){
 }
 
 function deleteBottleBatch(id){if(!confirm('Pozmaly?'))return;DB.bottleBatches=DB.bottleBatches.filter(b=>b.id!==id);save();renderBottlesPage();}
-function deleteDelivery(id){if(!confirm('Ibermäni pozmaly?'))return;DB.deliveries=DB.deliveries.filter(d=>d.id!==id);save();renderStorePage(currentStoreId);renderStoresNav();}
+function deleteDelivery(id){if(!confirm('Ibermäni pozmaly?'))return;DB.deliveries=DB.deliveries.filter(d=>d.id!==id);save();renderStorePage(currentStoreId);renderStoresNav();renderDashboard();}
 function deleteStore(id){if(!confirm('Dükany we ähli maglumatlary pozmaly?'))return;DB.stores=DB.stores.filter(s=>s.id!==id);DB.deliveries=DB.deliveries.filter(d=>d.storeId!==id);DB.payments=DB.payments.filter(p=>p.storeId!==id);DB.returns=DB.returns.filter(r=>r.storeId!==id);DB.exchanges=DB.exchanges.filter(e=>e.storeId!==id);save();renderStoresNav();showPage('dashboard');}
-function deletePurchase(id){if(!confirm('Pozmaly?'))return;DB.purchases=DB.purchases.filter(p=>p.id!==id);save();renderPurchasesPage();}
-function deletePayment(id){if(!confirm('Pozmaly?'))return;DB.payments=DB.payments.filter(p=>p.id!==id);save();renderStorePage(currentStoreId);renderStoresNav();}
-function deleteReturn(id){if(!confirm('Pozmaly?'))return;DB.returns=DB.returns.filter(r=>r.id!==id);save();renderStorePage(currentStoreId);}
+function deletePurchase(id){if(!confirm('Pozmaly?'))return;DB.purchases=DB.purchases.filter(p=>p.id!==id);save();renderPurchasesPage();renderDashboard();}
+function deletePayment(id){if(!confirm('Pozmaly?'))return;DB.payments=DB.payments.filter(p=>p.id!==id);save();renderStorePage(currentStoreId);renderStoresNav();renderDashboard();}
+function deleteReturn(id){if(!confirm('Pozmaly?'))return;DB.returns=DB.returns.filter(r=>r.id!==id);save();renderStorePage(currentStoreId);renderDashboard();}
 
 // ═══════════════ NAVIGATION ═══════════════
 function showPage(name, storeId){
@@ -1221,7 +1225,7 @@ function saveSupplierPayment(){
 function deleteSupplierPayment(id){
   if(!confirm('Pozmaly?'))return;
   DB.supplierPayments=DB.supplierPayments.filter(p=>p.id!==id);
-  save();renderPurchasesPage();
+  save();renderPurchasesPage();renderDashboard();
 }
 function renderPurchasesPage(){
   const total=DB.purchases.reduce((s,p)=>s+p.qty*p.cost,0);
@@ -1460,13 +1464,13 @@ function saveExchange(){
   const newQty=parseInt(document.getElementById('exc-new-qty').value);
   if(!date||!returnQty||!newQty){toast('Ähli ýerleri dolduryň','error');return;}
   DB.exchanges.push({id:uid(),storeId:currentStoreId,date,returnQty,newQty,reason:document.getElementById('exc-reason').value.trim(),note:document.getElementById('exc-note').value.trim()});
-  save();closeModal('modal-exchange');renderStorePage(currentStoreId);toast('Çalyşma ýazyldy');
+  save();closeModal('modal-exchange');renderStorePage(currentStoreId);renderDashboard();toast('Çalyşma ýazyldy');
 }
 
 function deleteExchange(id){
   if(!confirm('Pozmaly?'))return;
   DB.exchanges=DB.exchanges.filter(e=>e.id!==id);
-  save();renderStorePage(currentStoreId);
+  save();renderStorePage(currentStoreId);renderDashboard();
 }
 
 // ═══════════════ STORES LIST PAGE ═══════════════
