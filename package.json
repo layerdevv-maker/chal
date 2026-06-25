@@ -15,10 +15,9 @@
     "mac": {
       "category": "public.app-category.business",
       "identity": null,
-      "target": [
-        { "target": "dmg", "arch": ["arm64"] },
-        { "target": "dmg", "arch": ["x64"] }
-      ],
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "target": [{ "target": "dir" }],
       "icon": "assets/icon.png"
     },
     "files": ["index.html", "electron/**/*", "db/**/*", "assets/**/*"],

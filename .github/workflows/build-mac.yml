@@ -27,15 +27,38 @@ jobs:
       - name: Rebuild better-sqlite3
         run: npx electron-rebuild -f -w better-sqlite3
 
-      - name: Build DMG (arm64)
-        run: npx electron-builder --mac --arm64 --publish never
+      # ── arm64 ──────────────────────────────────────────
+      - name: Build app (arm64)
+        run: npx electron-builder --mac --arm64 --dir --publish never
 
-      - name: Build DMG (x64)
-        run: npx electron-builder --mac --x64 --publish never
+      - name: Sign arm64 (ad-hoc)
+        run: codesign --deep --force --sign - "dist/mac-arm64/Kaswa Jebel Caly.app"
 
-      - name: Upload artifacts
+      - name: Package arm64 DMG
+        run: |
+          hdiutil create -volname "Kaswa Jebel Caly" \
+            -srcfolder "dist/mac-arm64/Kaswa Jebel Caly.app" \
+            -ov -format UDZO \
+            "dist/Kaswa-Jebel-Caly-arm64.dmg"
+
+      # ── x64 ────────────────────────────────────────────
+      - name: Build app (x64)
+        run: npx electron-builder --mac --x64 --dir --publish never
+
+      - name: Sign x64 (ad-hoc)
+        run: codesign --deep --force --sign - "dist/mac-x64/Kaswa Jebel Caly.app"
+
+      - name: Package x64 DMG
+        run: |
+          hdiutil create -volname "Kaswa Jebel Caly" \
+            -srcfolder "dist/mac-x64/Kaswa Jebel Caly.app" \
+            -ov -format UDZO \
+            "dist/Kaswa-Jebel-Caly-x64.dmg"
+
+      # ── Upload ─────────────────────────────────────────
+      - name: Upload DMGs
         uses: actions/upload-artifact@v4
         with:
           name: kaswa-jebel-caly-mac
-          path: dist/*.dmg
+          path: dist/Kaswa-Jebel-Caly-*.dmg
           retention-days: 30
